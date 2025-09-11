@@ -26,10 +26,17 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $settings = new admin_settingpage('local_datacurso_ratings_settings', new lang_string('pluginname', 'local_datacurso_ratings'));
+    // Crear categoría propia para el plugin en la administración.
+    $ADMIN->add('localplugins', new admin_category(
+        'local_datacurso_ratings_category',
+        get_string('pluginname', 'local_datacurso_ratings')
+    ));
 
-    // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
-    if ($ADMIN->fulltree) {
-        // TO-DO: Define actual plugin settings page and add it to the tree - {@link https://docs.moodle.org/dev/Admin_settings}.
-    }
+    // Añadir un enlace hacia feedback.php.
+    $ADMIN->add('local_datacurso_ratings_category', new admin_externalpage(
+        'local_datacurso_ratings_feedback',
+        get_string('managefeedback', 'local_datacurso_ratings'),
+        new moodle_url('/local/datacurso_ratings/admin/feedback.php'),
+        'moodle/site:config' // Capacidad requerida
+    ));
 }

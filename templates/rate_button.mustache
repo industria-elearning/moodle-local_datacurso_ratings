@@ -1,0 +1,21 @@
+<div class="local-dcr-rate" data-cmid="{{cmid}}">
+    <button type="button" class="btn btn-secondary" data-action="open-rating">
+       ⭐ {{#str}} rateactivity, local_datacurso_ratings {{/str}}
+    </button>
+
+    <div class="local-dcr-panel" aria-hidden="true" style="display:none;margin-top:0.5rem;">
+        <div class="local-dcr-options" style="display:flex; gap:0.5rem; align-items:center;">
+            <button type="button" class="btn" data-action="rate" data-rating="1" aria-label="{{#str}} like, local_datacurso_ratings {{/str}}">👍</button>
+            <button type="button" class="btn" data-action="rate" data-rating="0" aria-label="{{#str}} dislike, local_datacurso_ratings {{/str}}">👎</button>
+        </div>
+
+        <div class="local-dcr-feedback" style="display:none; margin-top:0.5rem;">
+            <label for="local-dcr-feedback-input" class="form-label">{{#str}} feedbacklabel, local_datacurso_ratings {{/str}}</label>
+            <textarea id="local-dcr-feedback-input" class="form-control" rows="3"></textarea>
+            <div class="local-dcr-actions" style="margin-top:0.5rem; display:flex; gap:0.5rem;">
+                <button type="button" class="btn btn-primary" data-action="send">{{#str}} send, local_datacurso_ratings {{/str}}</button>
+                <button type="button" class="btn btn-secondary" data-action="cancel">{{#str}} cancel, local_datacurso_ratings {{/str}}</button>
+            </div>
+        </div>
+    </div>
+</div>

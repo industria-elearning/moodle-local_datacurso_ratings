@@ -1,44 +1,24 @@
-# Datacurso Ratings #
+# local_datacurso_ratings
 
-TO-DO Describe the plugin shortly here.
+Local plugin to allow users to rate a course module with a Like / Dislike button and optional feedback for negative ratings.
 
-TO-DO Provide more detailed description here.
+- **Hook used**: `\core\hook\output\after_http_headers` via `/db/hooks.php`
+- **UI**: Mustache template `templates/rate_button.mustache`
+- **JS**: ES6 AMD module in `amd/src/rate.js` (no jQuery, using `import` / `export`)
+- **Webservice**: `local_datacurso_ratings_save_rating` defined in `db/services.php`, implemented at `classes/external/save_rating.php`
+- **DB table**: `local_datacurso_ratings` (`cmid`, `userid`, `rating`, `feedback`, `timecreated`, `timemodified`) with unique index on (`cmid`, `userid`)
+- **Capability**: `local/datacurso_ratings:rate` (granted to Student/Teacher/Manager by default)
 
-## Installing via uploaded ZIP file ##
+## Install
 
-1. Log in to your Moodle site as an admin and go to _Site administration >
-   Plugins > Install plugins_.
-2. Upload the ZIP file with the plugin code. You should only be prompted to add
-   extra details if your plugin type is not automatically detected.
-3. Check the plugin validation report and finish the installation.
+1. Unzip into `local/datacurso_ratings` within your Moodle root.
+2. Go to *Site administration → Notifications* to trigger installation and the AMD build.
+3. Ensure role permissions allow `local/datacurso_ratings:rate` for the roles you want.
+4. Visit any activity page (e.g. a quiz or assignment) as a user with permission. A **Calificar actividad / Rate activity** button will appear.
 
-## Installing manually ##
+## Notes
 
-The plugin can be also installed by putting the contents of this directory to
-
-    {your/moodle/dirroot}/local/datacurso_ratings
-
-Afterwards, log in to your Moodle site as an admin and go to _Site administration >
-Notifications_ to complete the installation.
-
-Alternatively, you can run
-
-    $ php admin/cli/upgrade.php
-
-to complete the installation from the command line.
-
-## License ##
-
-Josue <josue@datacurso.com>
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see <https://www.gnu.org/licenses/>.
+- Negative rating shows a feedback textarea and sends it along with the rating.
+- Positive rating sends immediately with no feedback.
+- JS uses `core/ajax`, `core/notification`, and `core/str`.
+- The button is displayed only on module pages, for logged-in non-guest users with the required capability.
