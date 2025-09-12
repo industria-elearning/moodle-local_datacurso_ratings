@@ -31,36 +31,9 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('managefeedback', 'local_datacurso_ratings'));
 $PAGE->set_heading(get_string('managefeedback', 'local_datacurso_ratings'));
 
-// Procesar POST.
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_sesskey();
-
-    if (!empty($_POST['feedbacktext'])) {
-        // Insertar nueva frase.
-        $record = new stdClass();
-        $record->feedbacktext = required_param('feedbacktext', PARAM_TEXT);
-        $record->timecreated = time();
-        $record->timemodified = time();
-
-        $DB->insert_record('local_datacurso_ratings_feedback', $record);
-
-        redirect($PAGE->url, get_string('feedbacksaved', 'local_datacurso_ratings'),
-            null, \core\output\notification::NOTIFY_SUCCESS);
-
-    } else if (!empty($_POST['deleteid'])) {
-        // Eliminar frase existente.
-        $deleteid = required_param('deleteid', PARAM_INT);
-        $DB->delete_records('local_datacurso_ratings_feedback', ['id' => $deleteid]);
-
-        redirect($PAGE->url, get_string('feedbackdeleted', 'local_datacurso_ratings'),
-            null, \core\output\notification::NOTIFY_SUCCESS);
-    }
-}
 
 echo $OUTPUT->header();
-
-// Renderable + Renderer. LAS PETICIONES DEBEN SER EN UN WEB SERVICE 
+// Renderable + Renderer
 $renderable = new \local_datacurso_ratings\output\feedback_page();
 echo $OUTPUT->render($renderable);
-
 echo $OUTPUT->footer();

@@ -27,21 +27,17 @@
 <div class="feedback-admin">
 
     <h4>Datacurso Ratings</h4>
-    <form method="post" action="">
+
+    <form class="feedback-form">
         <input type="text" name="feedbacktext" placeholder="Agrega una respuesta preestablecida" required>
-        <input type="hidden" name="sesskey" value="{{sesskey}}">
         <button type="submit">Agregar</button>
     </form>
 
     <ul class="feedback-list">
         {{#items}}
             <li class="feedback-item">
-                {{feedbacktext}}
-                <form method="post" style="display:inline;">
-                    <input type="hidden" name="deleteid" value="{{id}}">
-                    <input type="hidden" name="sesskey" value="{{sesskey}}">
-                    <button type="submit" class="btn-delete"> ✖️ </button>
-                </form>
+                <span class="feedback-text">{{feedbacktext}}</span>
+                <button type="button" class="btn-delete" data-id="{{id}}">✖️</button>
             </li>
         {{/items}}
 
@@ -50,3 +46,8 @@
         {{/items}}
     </ul>
 </div>
+{{#js}}
+require(['local_datacurso_ratings/feedback'], function(module) {
+    module.init();
+});
+{{/js}}

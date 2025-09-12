@@ -20,3 +20,100 @@
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+// This file is part of Moodle - http://moodle.org/
+//
+// @module     local_datacurso_ratings/feedback
+// @copyright  2025 Industria Elearning
+// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+// This file is part of Moodle - http://moodle.org/
+//
+// @module     local_datacurso_ratings/feedback
+// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+import Ajax from "core/ajax";
+import Notification from "core/notification";
+
+/**
+ * Enviar nuevo feedback vía AJAX.
+ *
+ * @param {string} feedbacktext Texto del feedback que se va a agregar.
+ * @returns {Promise<object>} Respuesta del servidor.
+ */
+function addFeedback(feedbacktext) {
+    const requests = Ajax.call([{
+        methodname: "local_datacurso_ratings_add_feedback",
+        args: {feedbacktext}
+    }]);
+
+    return requests[0];
+}
+
+/**
+ * Eliminar feedback vía AJAX.
+ *
+ * @param {number|string} id ID del feedback que se quiere eliminar.
+ * @returns {Promise<object>} Respuesta del servidor.
+ */
+function deleteFeedback(id) {
+    const requests = Ajax.call([{
+        methodname: "local_datacurso_ratings_delete_feedback",
+        args: {id}
+    }]);
+
+    return requests[0];
+}
+
+/**
+ * Inicializar listeners en el panel admin.
+ *
+ * @returns {void}
+ */
+export function init() {
+    const form = document.querySelector(".feedback-admin form");
+    const list = document.querySelector(".feedback-list");
+
+    if (!form || !list) {
+        return;
+    }
+
+    // Agregar nuevo feedback
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const input = form.querySelector("input[name='feedbacktext']");
+        if (!input.value.trim()) {
+            return;
+        }
+
+        addFeedback(input.value.trim())
+            .then((resp) => {
+                Notification.addNotification({ message: resp.message, type: "success" });
+
+                // Agregar dinámicamente a la lista
+                const li = document.createElement("li");
+                li.className = "feedback-item";
+                li.innerHTML = `
+                    ${input.value}
+                    <button class="btn-delete" data-id="${resp.id}">✖️</button>
+                `;
+                list.prepend(li);
+                input.value = "";
+            })
+            .catch(Notification.exception);
+    });
+
+    // Eliminar feedback
+    list.addEventListener("click", (e) => {
+        if (e.target.classList.contains("btn-delete")) {
+            const id = e.target.dataset.id;
+
+            deleteFeedback(id)
+                .then((resp) => {
+                    Notification.addNotification({ message: resp.message, type: "success" });
+                    e.target.closest("li").remove();
+                })
+                .catch(Notification.exception);
+        }
+    });
+}

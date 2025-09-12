@@ -41,11 +41,15 @@ class hook_callbacks {
         }
 
         $cm = $PAGE->cm;
+        
+        $feedbackpage = new \local_datacurso_ratings\output\feedback_page();
+        $feedbackdata = $feedbackpage->export_for_template($OUTPUT);
 
-        // Render the button + container via mustache.
         $html = $OUTPUT->render_from_template('local_datacurso_ratings/rate_button', [
             'cmid' => $cm->id,
+            'items' => $feedbackdata['items'],
         ]);
+
         $hook->add_html($html);
 
         // Require JS (AMD/ES6) for this cmid.

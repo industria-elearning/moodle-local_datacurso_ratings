@@ -13,52 +13,64 @@ export const init = (cmid) => {
         return;
     }
 
-    const openBtn = container.querySelector('[data-action="open-rating"]');
-    const panel = container.querySelector('.local-dcr-panel');
     const fbBlock = container.querySelector('.local-dcr-feedback');
     const fbInput = container.querySelector('#local-dcr-feedback-input');
+    const fbTextareaWrap = container.querySelector('#local-dcr-feedback-textarea');
     const sendBtn = container.querySelector('[data-action="send"]');
     const cancelBtn = container.querySelector('[data-action="cancel"]');
 
     const show = el => { if (el) { el.style.display = 'block'; el.setAttribute('aria-hidden', 'false'); } };
     const hide = el => { if (el) { el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); } };
 
-    openBtn?.addEventListener('click', () => {
-        if (panel.style.display === 'none' || panel.getAttribute('aria-hidden') === 'true') {
-            show(panel);
-            hide(fbBlock);
-            if (fbInput) fbInput.value = ''; 
-        } else {
-            hide(panel);
-            hide(fbBlock);
-            if (fbInput) fbInput.value = '';
-        }
-    });
-
+    // Eventos para rate 👍 y 👎
     container.querySelectorAll('[data-action="rate"]').forEach(btn => {
         btn.addEventListener('click', () => {
             const rating = parseInt(btn.dataset.rating, 10);
             if (rating === 0) {
+                // Dislike → mostrar bloque de feedback
                 show(fbBlock);
-                fbInput?.focus();
-                // Wait for user to submit feedback.
                 sendBtn?.setAttribute('data-rating', '0');
             } else {
-                // Positive rating straight away.
+                // Like → guardar directo
                 sendRating(cmid, 1, '');
             }
         });
     });
 
-    cancelBtn?.addEventListener('click', () => {
-        hide(fbBlock);
-        hide(panel);
-        if (fbInput) fbInput.value = '';
+    // Mostrar textarea solo si selecciona "Otras"
+    container.querySelectorAll('input[name="feedback_choice"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.value === 'other' && radio.checked) {
+                show(fbTextareaWrap);
+                fbInput?.focus();
+            } else if (radio.checked) {
+                hide(fbTextareaWrap);
+            }
+        });
     });
 
+    // Cancelar feedback
+    cancelBtn?.addEventListener('click', () => {
+        hide(fbBlock);
+        hide(fbTextareaWrap);
+        if (fbInput) fbInput.value = '';
+        container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.checked = false);
+    });
+
+    // Enviar feedback
     sendBtn?.addEventListener('click', () => {
         const rating = parseInt(sendBtn.getAttribute('data-rating') || '0', 10);
-        const feedback = (fbInput?.value || '').trim();
+        const selected = container.querySelector('input[name="feedback_choice"]:checked');
+
+        let feedback = '';
+        if (selected) {
+            if (selected.value === 'other') {
+                feedback = (fbInput?.value || '').trim();
+            } else {
+                feedback = selected.value;
+            }
+        }
+
         sendRating(cmid, rating, feedback);
     });
 
@@ -68,14 +80,18 @@ export const init = (cmid) => {
             args: {cmid, rating, feedback}
         }])[0]
         .then(async() => {
-            const thanks = await getString('ratedthanks', 'local_datacurso_ratings');
             const saved = await getString('ratingsaved', 'local_datacurso_ratings');
             Notification.addNotification({message: saved, type: 'success'});
-            hide(panel);
-            if (openBtn) {
-                openBtn.disabled = true;
-                openBtn.textContent = thanks; 
+
+            // Deshabilitar botones después de enviar
+            if (container) {
+                container.querySelectorAll('[data-action="rate"]').forEach(btn => btn.disabled = true);
+                container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.disabled = true);
+                if (sendBtn) sendBtn.disabled = true;
             }
+
+            hide(fbBlock);
+            hide(fbTextareaWrap);
         })
         .catch(Notification.exception);
     }

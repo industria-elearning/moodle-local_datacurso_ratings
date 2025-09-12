@@ -28,21 +28,21 @@ use renderable;
 use templatable;
 use renderer_base;
 use stdClass;
-
 class feedback_page implements renderable, templatable {
-
-    public function export_for_template(renderer_base $output): array {
+    private $items;
+    public function __construct() {
         global $DB;
-
         $records = $DB->get_records('local_datacurso_ratings_feedback', null, 'id DESC');
-
-        $items = [];
-        foreach ($records as $rec) {
-            $items[] = [
-            'id' => $rec->id,
-            'feedbacktext' => $rec->feedbacktext
-        ];
+        $this->items = array_values($records);
     }
+    public function export_for_template(renderer_base $output) {
+        $items = [];
+        foreach ($this->items as $rec) {
+            $items[] = [
+                'id' => $rec->id,
+                'feedbacktext' => $rec->feedbacktext,
+            ];
+        }
 
         return [
             'items' => $items,
