@@ -9,7 +9,6 @@ $functions = [
         'description' => 'Save user rating (like/dislike) and optional feedback for a course module.',
         'type'        => 'write',
         'ajax'        => true,
-        'capabilities'=> 'local/datacurso_ratings:rate'
     ],
      'local_datacurso_ratings_add_feedback' => [
         'classname'   => 'local_datacurso_ratings\external\feedback_service',
@@ -28,5 +27,12 @@ $functions = [
         'type'        => 'write',
         'ajax'        => true,
         'capabilities'=> 'moodle/site:config'
-    ]
+    ],
+        'local_datacurso_ratings_get_ratings_report' => [
+        'classname'   => 'local_datacurso_ratings\external\get_ratings_report',
+        'methodname'  => 'execute',
+        'description' => 'Obtiene un reporte resumido de calificaciones y feedbacks por curso/actividad',
+        'type'        => 'read',
+        'ajax'        => true,
+    ],
 ];

@@ -39,4 +39,13 @@ if ($hassiteconfig) {
         new moodle_url('/local/datacurso_ratings/admin/feedback.php'),
         'moodle/site:config' // Capacidad requerida
     ));
+
+        // Enlace para ver el reporte administrativo de calificaciones.
+    $ADMIN->add('local_datacurso_ratings_category', new admin_externalpage(
+        'local_datacurso_ratings_report',
+        get_string('ratingsreport', 'local_datacurso_ratings'),
+        new moodle_url('/local/datacurso_ratings/admin/report.php'),
+        'moodle/site:config'
+    ));
+    
 }

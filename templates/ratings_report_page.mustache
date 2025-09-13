@@ -1,0 +1,62 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_datacurso_ratings/ratings_report_page
+
+    TODO describe template rating_report_page
+
+    Example context (json):
+    {
+    }
+}}
+
+<div class="local-dcr-report">
+    <h2>{{title}}</h2>
+
+    <div class="report-controls" style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.75rem;">
+        <input type="search" class="report-filter" placeholder="{{#str}} filterplaceholder, local_datacurso_ratings {{/str}}" />
+        <div class="report-spinner" style="margin-left:8px; display:none;">{{#str}} loading, local_datacurso_ratings {{/str}}</div>
+    </div>
+
+    <div class="report-table-wrap">
+        <table class="table table-striped" id="local-dcr-report-table" style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>{{#str}} course, local_datacurso_ratings {{/str}}</th>
+                    <th>{{#str}} activity, local_datacurso_ratings {{/str}}</th>
+                    <th>👍 {{#str}} likes, local_datacurso_ratings {{/str}}</th>
+                    <th>👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</th>
+                    <th>% {{#str}} approval, local_datacurso_ratings {{/str}}</th>
+                    <th>📃 {{#str}} comments, local_datacurso_ratings {{/str}}</th>
+                </tr>
+            </thead>
+            <tbody id="local-dcr-report-body">
+                <!-- JS will inject rows here -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="report-empty" style="display:none; margin-top:1rem;">
+        <em>{{#str}} nodata, local_datacurso_ratings {{/str}}</em>
+    </div>
+</div>
+
+{{#js}}
+require(['local_datacurso_ratings/ratings_report'], function(module) {
+    module.init();
+});
+{{/js}}

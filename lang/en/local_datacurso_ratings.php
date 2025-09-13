@@ -19,3 +19,17 @@ $string['existingfeedback'] = 'Feedbacks existentes';
 $string['feedbacksaved'] = 'El feedback se guardó correctamente';
 $string['nofeedback'] = 'Aún no se han agregado feedbacks';
 $string['feedbackdeleted'] = 'La frase fue eliminada correctamente';
+
+// Strings admin report rating 
+$string['ratingsreport'] = 'Reporte de calificaciones';
+$string['ratingsreporttitle'] = 'Reporte de valoraciones';
+$string['filterplaceholder'] = 'Filtrar por curso, actividad o comentario...';
+$string['exportcsv'] = 'Exportar CSV';
+$string['loading'] = 'Cargando...';
+$string['nodata'] = 'No hay datos disponibles en el reporte.';
+$string['course'] = 'Curso';
+$string['activity'] = 'Actividad';
+$string['likes'] = 'Me gusta';
+$string['dislikes'] = 'No me gusta';
+$string['approval'] = 'Aprobación';
+$string['comments'] = 'Comentarios';
