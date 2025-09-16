@@ -18,26 +18,47 @@ export const init = (cmid) => {
     const fbTextareaWrap = container.querySelector('#local-dcr-feedback-textarea');
     const sendBtn = container.querySelector('[data-action="send"]');
     const cancelBtn = container.querySelector('[data-action="cancel"]');
+    const likeOptions = container.querySelector('.like-options');
+    const dislikeOptions = container.querySelector('.dislike-options');
 
-    const show = el => { if (el) { el.style.display = 'block'; el.setAttribute('aria-hidden', 'false'); } };
-    const hide = el => { if (el) { el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); } };
+    const show = el => { 
+        if (el) { 
+            el.style.display = 'block'; 
+            el.setAttribute('aria-hidden', 'false'); 
+        } 
+    };
+    const hide = el => { 
+        if (el) { 
+            el.style.display = 'none'; 
+            el.setAttribute('aria-hidden', 'true'); 
+        } 
+    };
 
     // Eventos para rate 👍 y 👎
     container.querySelectorAll('[data-action="rate"]').forEach(btn => {
         btn.addEventListener('click', () => {
             const rating = parseInt(btn.dataset.rating, 10);
+            
             if (rating === 0) {
-                // Dislike → mostrar bloque de feedback
+                // Dislike → mostrar opciones de dislike
                 show(fbBlock);
+                show(dislikeOptions);
+                hide(likeOptions);
                 sendBtn?.setAttribute('data-rating', '0');
             } else {
-                // Like → guardar directo
-                sendRating(cmid, 1, '');
+                // Like → mostrar opciones de like
+                show(fbBlock);
+                show(likeOptions);
+                hide(dislikeOptions);
+                sendBtn?.setAttribute('data-rating', '1');
             }
+            
+            // Ocultar textarea al cambiar de rating
+            hide(fbTextareaWrap);
         });
     });
 
-    // Mostrar textarea solo si selecciona "Otras"
+    // Mostrar textarea específico si selecciona "Otras"
     container.querySelectorAll('input[name="feedback_choice"]').forEach(radio => {
         radio.addEventListener('change', () => {
             if (radio.value === 'other' && radio.checked) {
@@ -53,8 +74,15 @@ export const init = (cmid) => {
     cancelBtn?.addEventListener('click', () => {
         hide(fbBlock);
         hide(fbTextareaWrap);
+        
+        // Limpiar todos los campos
         if (fbInput) fbInput.value = '';
+        
+        // Desmarcar todos los radios
         container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.checked = false);
+        
+        // Remover el data-rating del botón send
+        sendBtn?.removeAttribute('data-rating');
     });
 
     // Enviar feedback
@@ -63,6 +91,8 @@ export const init = (cmid) => {
         const selected = container.querySelector('input[name="feedback_choice"]:checked');
 
         let feedback = '';
+        
+        // Para ambos casos (like y dislike)
         if (selected) {
             if (selected.value === 'other') {
                 feedback = (fbInput?.value || '').trim();
@@ -88,8 +118,11 @@ export const init = (cmid) => {
                 container.querySelectorAll('[data-action="rate"]').forEach(btn => btn.disabled = true);
                 container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.disabled = true);
                 if (sendBtn) sendBtn.disabled = true;
+                if (cancelBtn) cancelBtn.disabled = true;
+                if (fbInput) fbInput.disabled = true;
             }
 
+            // Ocultar bloques de feedback
             hide(fbBlock);
             hide(fbTextareaWrap);
         })

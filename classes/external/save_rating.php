@@ -53,7 +53,7 @@ class save_rating extends external_api {
             'cmid' => $cm->id,
             'userid' => $USER->id,
             'rating' => $r,
-            'feedback' => $r === 0 ? (string)$params['feedback'] : '',
+            'feedback' => (string)$params['feedback'],
             'timemodified' => $now,
         ];
 

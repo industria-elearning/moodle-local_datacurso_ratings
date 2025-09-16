@@ -1,0 +1,184 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_datacurso_ratings/report_ratings_course
+
+    TODO describe template report_ratings_course
+
+    Example context (json):
+    {
+    }
+}}
+
+{{!
+    Template for displaying course ratings report table
+    
+    Context variables:
+    * activities - Array of activity rating data
+    * has_data - Boolean indicating if there's data to show
+    * summary - Summary statistics object
+    * courseid - Course ID
+}}
+
+{{#has_data}}
+<!-- Summary Statistics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{#str}} reportSummary, local_datacurso_ratings {{/str}}</h5>
+                <div class="row">
+                    <div class="col-md-2 col-sm-4 text-center">
+                        <div class="border-end">
+                            <h3 class="text-primary mb-0">{{summary.total_activities}}</h3>
+                            <small class="text-muted">{{#str}} totalActivities, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 text-center">
+                        <div class="border-end">
+                            <h3 class="text-info mb-0">{{summary.activities_with_ratings}}</h3>
+                            <small class="text-muted">{{#str}} ratedActivities, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 text-center">
+                        <div class="border-end">
+                            <h3 class="text-secondary mb-0">{{summary.total_ratings}}</h3>
+                            <small class="text-muted">{{#str}} totalRatings, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 text-center">
+                        <div class="border-end">
+                            <h3 class="text-success mb-0">{{summary.total_likes}}</h3>
+                            <small class="text-muted">👍 {{#str}} likes, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 text-center">
+                        <div class="border-end">
+                            <h3 class="text-danger mb-0">{{summary.total_dislikes}}</h3>
+                            <small class="text-muted">👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 text-center">
+                        <h3 class="text-{{summary.satisfaction_class}} mb-0">{{summary.overall_satisfaction}}%</h3>
+                        <small class="text-muted">{{#str}} satisfaction, local_datacurso_ratings {{/str}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ratings Table -->
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th data-sort="actividad">{{#str}} activity, local_datacurso_ratings {{/str}}</th>
+                <th data-sort="total_ratings" class="text-center">{{#str}} totalRatings, local_datacurso_ratings {{/str}}</th>
+                <th data-sort="likes" class="text-center">👍 {{#str}} likes, local_datacurso_ratings {{/str}}</th>
+                <th data-sort="dislikes" class="text-center">👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</th>
+                <th data-sort="porcentaje" class="text-center">{{#str}} satisfaction, local_datacurso_ratings {{/str}}</th>
+                <th class="text-center">{{#str}} comments, local_datacurso_ratings {{/str}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#activities}}
+            <tr {{^has_ratings}}class="table-secondary opacity-75"{{/has_ratings}}>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <strong>
+                            <a href="{{activityurl}}" target="_blank">{{actividad}}</a>
+                        </strong>
+                        {{^has_ratings}}
+                        <span class="badge bg-secondary ms-2 small">{{#str}} noRatings, local_datacurso_ratings {{/str}}</span>
+                        {{/has_ratings}}
+                    </div>
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-primary">{{total_ratings}}</span>
+                </td>
+                <td class="text-center">
+                    {{#has_ratings}}
+                    <span class="text-success fw-bold">{{likes}}</span>
+                    {{/has_ratings}}
+                    {{^has_ratings}}
+                    <span class="text-muted">0</span>
+                    {{/has_ratings}}
+                </td>
+                <td class="text-center">
+                    {{#has_ratings}}
+                    <span class="text-danger fw-bold">{{dislikes}}</span>
+                    {{/has_ratings}}
+                    {{^has_ratings}}
+                    <span class="text-muted">0</span>
+                    {{/has_ratings}}
+                </td>
+                <td class="text-center">
+                    {{#has_ratings}}
+                    <span class="badge bg-{{satisfaction_class}} fs-6">{{formatted_percentage}}</span>
+                    {{/has_ratings}}
+                    {{^has_ratings}}
+                    <span class="text-muted">N/A</span>
+                    {{/has_ratings}}
+                </td>
+                <td class="text-center">
+                    {{#has_comments}}
+                    <button type="button" class="btn btn-sm btn-outline-info expand-comments" data-target="#comments-{{@index}}">
+                        {{#str}} viewComments, local_datacurso_ratings {{/str}}
+                    </button>
+                    {{/has_comments}}
+                    {{^has_comments}}
+                    <span class="text-muted">{{#str}} noComments, local_datacurso_ratings {{/str}}</span>
+                    {{/has_comments}}
+                </td>
+            </tr>
+            {{#has_comments}}
+            <tr>
+                <td colspan="7">
+                    <div id="comments-{{@index}}" class="collapse-comments" style="display: none;">
+                        <div class="alert alert-light mt-2">
+                            <h6>{{#str}} studentFeedback, local_datacurso_ratings {{/str}}:</h6>
+                            <div class="comments-content">
+                                {{#str}} comments, local_datacurso_ratings {{/str}}: {{comentarios}}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {{/has_comments}}
+            {{/activities}}
+        </tbody>
+    </table>
+</div>
+
+{{/has_data}}
+
+{{^has_data}}
+<!-- No Data Message -->
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="fa fa-chart-line fa-3x text-muted"></i>
+    </div>
+    <h4 class="text-muted">{{#str}} noDataAvailable, local_datacurso_ratings {{/str}}</h4>
+    <p class="text-muted">{{#str}} noDataDescription, local_datacurso_ratings {{/str}}</p>
+    <div class="mt-4">
+        <a href="#" class="btn btn-primary" onclick="location.reload()">
+            <i class="fa fa-refresh"></i> {{#str}} refresh, local_datacurso_ratings {{/str}}
+        </a>
+    </div>
+</div>
+{{/has_data}}

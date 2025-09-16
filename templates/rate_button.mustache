@@ -3,28 +3,41 @@
         <button type="button" class="btn" data-action="rate" data-rating="1" aria-label="{{#str}} like, local_datacurso_ratings {{/str}}" title="👍 Me gusta la actividad">👍</button>
         <button type="button" class="btn" data-action="rate" data-rating="0" aria-label="{{#str}} dislike, local_datacurso_ratings {{/str}}" title="👎 No me gusta la actividad">👎</button>
     </div>
-
+    
     <div class="local-dcr-feedback" style="display:none; margin-top:0.5rem;">
         <label class="form-label">{{#str}} feedbacklabel, local_datacurso_ratings {{/str}}</label>
 
         <div class="local-dcr-feedback-options" style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-            {{#items}}
-                <label class="feedback-option btn btn-outline-primary">
-                    <input type="radio" name="feedback_choice" value="{{feedbacktext}}">
-                    {{feedbacktext}}
-                </label>
-            {{/items}}
+            <!-- Opciones para dislike -->
+            <div class="dislike-options" style="display:none;">
+                {{#dislikeItems}}
+                    <label class="feedback-option btn btn-outline-primary">
+                        <input type="radio" name="feedback_choice" value="{{feedbacktext}}">
+                        {{feedbacktext}}
+                    </label>
+                {{/dislikeItems}}
+            </div>
             
-            <!-- Otras opción -->
+            <!-- Opciones para like -->
+            <div class="like-options" style="display:none;">
+                {{#likeItems}}
+                    <label class="feedback-option btn btn-outline-primary">
+                        <input type="radio" name="feedback_choice" value="{{feedbacktext}}">
+                        {{feedbacktext}}
+                    </label>
+                {{/likeItems}}
+            </div>
+            
+            <!-- Opción "Otras" -->
             <label class="feedback-option btn btn-outline-secondary">
                 <input type="radio" name="feedback_choice" value="other" style="display:none;">
                 Otras
             </label>
         </div>
 
-        <!-- Textarea oculto por defecto -->
+        <!-- Textarea oculto por defecto para "Otras" -->
         <div id="local-dcr-feedback-textarea" style="display:none; margin-top:0.5rem;">
-            <textarea id="local-dcr-feedback-input" class="form-control" rows="3"></textarea>
+            <textarea id="local-dcr-feedback-input" class="form-control" rows="3" placeholder="{{#str}} feedbackplaceholder, local_datacurso_ratings {{/str}}"></textarea>
         </div>
 
         <div class="local-dcr-actions" style="margin-top:0.5rem; display:flex; gap:0.5rem;">

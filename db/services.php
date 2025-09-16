@@ -35,4 +35,12 @@ $functions = [
         'type'        => 'read',
         'ajax'        => true,
     ],
+      'local_datacurso_ratings_get_ratings_report_course' => [
+        'classname'   => 'local_datacurso_ratings\external\get_ratings_report_course',
+        'methodname'  => 'execute',
+        'classpath'   => '',
+        'description' => 'Devuelve el reporte de puntuaciones solo de las actividades de un curso',
+        'type'        => 'read',
+        'ajax'        => true,
+    ]
 ];

@@ -4,55 +4,64 @@ namespace local_datacurso_ratings;
 
 defined('MOODLE_INTERNAL') || die();
 
-use core\hook\output\after_http_headers;
+use core\hook\output\before_footer_html_generation;
 use context_module;
 
 /**
  * Hook callbacks for local_datacurso_ratings.
  */
 class hook_callbacks {
+
     /**
-     * Bootstrap the rating UI after HTTP headers.
+     * Inject the rating UI just before the footer is generated.
      *
-     * @param after_http_headers $hook
+     * @param before_footer_html_generation $hook
      * @return void
      */
-    public static function after_http_headers(after_http_headers $hook): void {
-        global $PAGE, $OUTPUT, $USER;
-        
+    public static function before_footer_html_generation(before_footer_html_generation $hook): void {
+        global $PAGE, $OUTPUT;
 
-        global $PAGE;
+        // No durante instalación inicial.
         if (during_initial_install()) {
             return;
         }
+
+        // Ignorar ciertos layouts (mantenimiento, impresión, redirección, etc.).
         if (in_array($PAGE->pagelayout, ['maintenance', 'print', 'redirect', 'embedded'])) {
-            // Do not try to show assist UI inside iframe, in maintenance mode,
-            // when printing, or during redirects.
             return;
         }
-        // Check we are in the right context, exit if not activity.
+
+        // Validar que estamos en un contexto de módulo.
         if ($PAGE->context->contextlevel != CONTEXT_MODULE) {
             return;
         }
 
-        // Only on module pages, for logged-in (non-guest) users.
+        // Validar que hay un cmid, que el usuario está logueado y que no es invitado.
         if (!$PAGE->cm || !isloggedin() || isguestuser()) {
             return;
         }
 
         $cm = $PAGE->cm;
-        
+
+        // Exportar datos para el template.
         $feedbackpage = new \local_datacurso_ratings\output\feedback_page();
         $feedbackdata = $feedbackpage->export_for_template($OUTPUT);
 
+        // Renderizar el template Mustache con los botones.
         $html = $OUTPUT->render_from_template('local_datacurso_ratings/rate_button', [
             'cmid' => $cm->id,
-            'items' => $feedbackdata['items'],
+            'likeItems' => [
+                ['feedbacktext' => 'Muy útil'],
+                ['feedbacktext' => 'Bien explicado'],
+                ['feedbacktext' => 'Interesante'],
+                ],
+            'dislikeItems' => $feedbackdata['items'],
         ]);
 
+        // Inyectar el HTML antes del footer.
         $hook->add_html($html);
 
-        // Require JS (AMD/ES6) for this cmid.
+        // Cargar JS (AMD/ES6) con el cmid.
         $PAGE->requires->js_call_amd('local_datacurso_ratings/rate', 'init', [$cm->id]);
     }
 }
