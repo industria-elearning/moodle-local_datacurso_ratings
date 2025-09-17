@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe file rating_report
+ * General ratings report page
  *
  * @package    local_datacurso_ratings
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
@@ -34,12 +34,13 @@ $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('ratingsreport', 'local_datacurso_ratings'));
 $PAGE->set_heading(get_string('ratingsreport', 'local_datacurso_ratings'));
 
-// Incluir el JS AMD.
-$PAGE->requires->js_call_amd('local_datacurso_ratings/ratings_report', 'init');
-
+// IMPORTANTE: Header ANTES del contenido
 echo $OUTPUT->header();
 
-// Renderizar el contenedor Mustache vacío, que se llenará con JS.
-echo $OUTPUT->render_from_template('local_datacurso_ratings/ratings_report_page', []);
+// Contenedor para el reporte (será llenado por JavaScript)
+echo '<div id="general-ratings-report-container"></div>';
+
+// Inicializar el JavaScript module
+$PAGE->requires->js_call_amd('local_datacurso_ratings/ratings_report', 'init', []);
 
 echo $OUTPUT->footer();

@@ -26,7 +26,7 @@ $string['nofeedback'] = 'Aún no se han agregado feedbacks';
 $string['feedbackdeleted'] = 'La frase fue eliminada correctamente';
 
 // Strings admin report rating 
-$string['ratingsreport'] = 'Reporte de calificaciones';
+$string['ratingsreport'] = 'Reporte General de Puntuación';
 $string['ratingsreporttitle'] = 'Reporte de valoraciones';
 $string['filterplaceholder'] = 'Filtrar por curso, actividad o comentario...';
 $string['exportcsv'] = 'Exportar CSV';
@@ -38,9 +38,12 @@ $string['likes'] = 'Me gusta';
 $string['dislikes'] = 'No me gusta';
 $string['approval'] = 'Aprobación';
 $string['comments'] = 'Comentarios';
+$string['totalCourses'] = 'Total de cursos';
 
 //Reports course 
 $string['activityratingsreport'] = 'Reporte de puntuaciones de las actividades/recursos';
+
+
 // Reports
 $string['reports'] = 'Reports & Statistics';
 $string['reports_desc'] = 'View rating statistics and reports';
@@ -64,3 +67,17 @@ $string['exportCSV'] = 'Export CSV';
 $string['noDataAvailable'] = 'No data available';
 $string['noDataDescription'] = 'No ratings have been submitted for activities in this course yet.';
 $string['refresh'] = 'Refresh';
+
+// General report strings
+$string['globalReportSummary'] = 'Global Report Summary';
+$string['globalSatisfaction'] = 'Global Satisfaction';
+$string['searchActivities'] = 'Search activities...';
+$string['allCourses'] = 'All Courses';
+$string['activities'] = 'activities';
+$string['actions'] = 'Actions';
+$string['viewActivity'] = 'View Activity';
+$string['detailedReport'] = 'Detailed Report';
+$string['noGlobalDataAvailable'] = 'No Global Data Available';
+$string['noGlobalDataDescription'] = 'No ratings have been submitted for any activities across all courses yet.';
+$string['getStarted'] = 'Get Started';
+$string['getStartedDescription'] = 'Once students start rating activities and resources, their feedback will appear here in comprehensive reports.';

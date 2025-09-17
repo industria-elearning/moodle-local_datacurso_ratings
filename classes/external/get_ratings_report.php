@@ -16,14 +16,6 @@
 
 namespace local_datacurso_ratings\external;
 
-/**
- * Class get_ratings_report
- *
- * @package    local_datacurso_ratings
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/externallib.php");
@@ -34,8 +26,10 @@ use external_single_structure;
 use external_multiple_structure;
 use external_api;
 use context_system;
-use moodle_exception;
 
+/**
+ * Webservice para traer el reporte general de actividades con ratings
+ */
 class get_ratings_report extends external_api {
 
     /**
@@ -53,66 +47,62 @@ class get_ratings_report extends external_api {
 
         $params = self::validate_parameters(self::execute_parameters(), []);
 
-$sql = "
-    SELECT c.fullname AS curso,
-           inst.name AS actividad,
-           m.name AS tipo_modulo,
-           SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
-           SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes,
-           ROUND(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(r.id), 1) AS porcentaje_aprobacion,
-           GROUP_CONCAT(DISTINCT r.feedback SEPARATOR ' / ') AS comentarios
-    FROM {local_datacurso_ratings} r
-    JOIN {course_modules} cm ON cm.id = r.cmid
-    JOIN {course} c ON c.id = cm.course
-    JOIN {modules} m ON m.id = cm.module
-    LEFT JOIN (
-        SELECT id, name, 'assign' AS modulename FROM {assign}
-        UNION ALL
-        SELECT id, name, 'quiz' AS modulename FROM {quiz}
-        UNION ALL
-        SELECT id, name, 'page' AS modulename FROM {page}
-        UNION ALL
-        SELECT id, name, 'forum' AS modulename FROM {forum}
-        UNION ALL
-        SELECT id, name, 'book' AS modulename FROM {book}
-        UNION ALL
-        SELECT id, name, 'url' AS modulename FROM {url}
-        UNION ALL
-        SELECT id, name, 'choice' AS modulename FROM {choice}
-        UNION ALL
-        SELECT id, name, 'glossary' AS modulename FROM {glossary}
-        UNION ALL
-        SELECT id, name, 'lesson' AS modulename FROM {lesson}
-        UNION ALL
-        SELECT id, name, 'scorm' AS modulename FROM {scorm}
-        UNION ALL
-        SELECT id, name, 'survey' AS modulename FROM {survey}
-        UNION ALL
-        SELECT id, name, 'wiki' AS modulename FROM {wiki}
-        UNION ALL
-        SELECT id, name, 'workshop' AS modulename FROM {workshop}
-        UNION ALL
-        SELECT id, name, 'label' AS modulename FROM {label}
-    ) inst ON inst.id = cm.instance AND inst.modulename = m.name
-    GROUP BY c.fullname, inst.name, m.name
-    ORDER BY c.fullname ASC
-";
-        
+        // Validar contexto de sistema (porque es reporte global).
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        // 1. Traer los ratings agrupados por cmid.
+        $sql = "
+            SELECT r.cmid,
+                   cm.course,
+                   SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
+                   SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes,
+                   ROUND(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(r.id), 1) AS porcentaje_aprobacion,
+                   GROUP_CONCAT(DISTINCT r.feedback SEPARATOR ' / ') AS comentarios
+            FROM {local_datacurso_ratings} r
+            JOIN {course_modules} cm ON cm.id = r.cmid
+            GROUP BY r.cmid, cm.course
+            ORDER BY cm.course ASC
+        ";
         $records = $DB->get_records_sql($sql);
 
         $result = [];
+
+        // 2. Agrupar por curso usando get_fast_modinfo.
+        $coursecache = []; // Cache local para no recalcular modinfo varias veces.
+
         foreach ($records as $r) {
+            $courseid = $r->course;
+
+            if (!isset($coursecache[$courseid])) {
+                $coursecache[$courseid] = get_fast_modinfo($courseid);
+            }
+            $modinfo = $coursecache[$courseid];
+
+            // Obtener info del módulo.
+            if (!$modinfo->cms || !isset($modinfo->cms[$r->cmid])) {
+                continue; // Si no existe el cmid, saltar.
+            }
+
+            $cm = $modinfo->get_cm($r->cmid);
+            if (!$cm->uservisible) {
+                continue; // Saltar si el usuario no tiene permiso de verlo.
+            }
+
             $commentsArray = [];
             if (!empty($r->comentarios)) {
                 $commentsArray = explode(' / ', $r->comentarios);
             }
-        
+
             $result[] = [
-                'course' => $r->curso,
-                'activity' => $r->actividad,
-                'likes' => (int) $r->likes,
-                'dislikes' => (int) $r->dislikes,
-                'approvalpercent' => (float) $r->porcentaje_aprobacion,
+                'course' => $modinfo->get_course()->fullname,
+                'activity' => $cm->name,
+                'modname' => $cm->modname,
+                'cmid' => $cm->id,
+                'url' => $cm->url ? $cm->url->out(false) : '',
+                'likes' => (int)$r->likes,
+                'dislikes' => (int)$r->dislikes,
+                'approvalpercent' => (float)$r->porcentaje_aprobacion,
                 'comments' => $commentsArray,
             ];
         }
@@ -128,6 +118,9 @@ $sql = "
             new external_single_structure([
                 'course' => new external_value(PARAM_TEXT, 'Nombre del curso'),
                 'activity' => new external_value(PARAM_TEXT, 'Nombre de la actividad'),
+                'modname' => new external_value(PARAM_TEXT, 'Tipo de módulo'),
+                'cmid' => new external_value(PARAM_INT, 'Course module ID'),
+                'url' => new external_value(PARAM_URL, 'URL de la actividad', VALUE_OPTIONAL),
                 'likes' => new external_value(PARAM_INT, 'Número de me gusta'),
                 'dislikes' => new external_value(PARAM_INT, 'Número de no me gusta'),
                 'approvalpercent' => new external_value(PARAM_FLOAT, '% de aprobación'),

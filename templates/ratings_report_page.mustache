@@ -24,39 +24,219 @@
     }
 }}
 
-<div class="local-dcr-report">
-    <h2>{{title}}</h2>
+{{!
+    Template for displaying general ratings report (all courses)
+    
+    Context variables:
+    * courses - Array of course data with activities
+    * has_data - Boolean indicating if there's data to show
+    * summary - Global summary statistics object
+}}
 
-    <div class="report-controls" style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.75rem;">
-        <input type="search" class="report-filter" placeholder="{{#str}} filterplaceholder, local_datacurso_ratings {{/str}}" />
-        <div class="report-spinner" style="margin-left:8px; display:none;">{{#str}} loading, local_datacurso_ratings {{/str}}</div>
-    </div>
-
-    <div class="report-table-wrap">
-        <table class="table table-striped" id="local-dcr-report-table" style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <th>{{#str}} course, local_datacurso_ratings {{/str}}</th>
-                    <th>{{#str}} activity, local_datacurso_ratings {{/str}}</th>
-                    <th>👍 {{#str}} likes, local_datacurso_ratings {{/str}}</th>
-                    <th>👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</th>
-                    <th>% {{#str}} approval, local_datacurso_ratings {{/str}}</th>
-                    <th>📃 {{#str}} comments, local_datacurso_ratings {{/str}}</th>
-                </tr>
-            </thead>
-            <tbody id="local-dcr-report-body">
-                <!-- JS will inject rows here -->
-            </tbody>
-        </table>
-    </div>
-
-    <div class="report-empty" style="display:none; margin-top:1rem;">
-        <em>{{#str}} nodata, local_datacurso_ratings {{/str}}</em>
+{{#has_data}}
+<!-- Global Summary Statistics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">{{#str}} globalReportSummary, local_datacurso_ratings {{/str}}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                        <div class="border-end">
+                            <h3 class="text-primary mb-0">{{summary.total_courses}}</h3>
+                            <small class="text-muted">{{#str}} totalCourses, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                        <div class="border-end">
+                            <h3 class="text-info mb-0">{{summary.total_activities}}</h3>
+                            <small class="text-muted">{{#str}} totalActivities, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                        <div class="border-end">
+                            <h3 class="text-secondary mb-0">{{summary.activities_with_ratings}}</h3>
+                            <small class="text-muted">{{#str}} ratedActivities, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                        <div class="border-end">
+                            <h3 class="text-success mb-0">{{summary.total_likes}}</h3>
+                            <small class="text-muted">👍 {{#str}} likes, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                        <div class="border-end">
+                            <h3 class="text-danger mb-0">{{summary.total_dislikes}}</h3>
+                            <small class="text-muted">👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                        <h3 class="text-{{summary.satisfaction_class}} mb-0">{{summary.overall_satisfaction}}%</h3>
+                        <small class="text-muted">{{#str}} globalSatisfaction, local_datacurso_ratings {{/str}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-{{#js}}
-require(['local_datacurso_ratings/ratings_report'], function(module) {
-    module.init();
-});
-{{/js}}
+<!-- Filters -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fa fa-search"></i></span>
+            <input type="text" class="form-control" id="activity-search" placeholder="{{#str}} searchActivities, local_datacurso_ratings {{/str}}">
+        </div>
+    </div>
+    <div class="col-md-6">
+        <select class="form-select" id="course-filter">
+            <option value="">{{#str}} allCourses, local_datacurso_ratings {{/str}}</option>
+            {{#courses}}
+            <option value="{{courseName}}">{{courseName}}</option>
+            {{/courses}}
+        </select>
+    </div>
+</div>
+
+<!-- Courses Sections -->
+{{#courses}}
+<div class="course-section mb-4" data-course="{{courseName}}">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-link course-toggle p-0 me-3" data-target="#course-{{@index}}" type="button">
+                        <i class="fa fa-chevron-down"></i>
+                    </button>
+                    <h5 class="mb-0">{{courseName}}</h5>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-light text-dark">{{courseActivities}} {{#str}} activities, local_datacurso_ratings {{/str}}</span>
+                    <span class="badge bg-success">{{courseLikes}} 👍</span>
+                    <span class="badge bg-danger">{{courseDislikes}} 👎</span>
+                    <span class="badge bg-{{courseSatisfactionClass}} fs-6">{{courseSatisfaction}}%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="collapse show" id="course-{{@index}}">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                         <thead class="table-dark">
+                            <tr>
+                                <th data-sort="actividad">{{#str}} activity, local_datacurso_ratings {{/str}}</th>
+                                <th data-sort="total_ratings" class="text-center">{{#str}} totalRatings, local_datacurso_ratings {{/str}}</th>
+                                <th data-sort="likes" class="text-center">👍 {{#str}} likes, local_datacurso_ratings {{/str}}</th>
+                                <th data-sort="dislikes" class="text-center">👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</th>
+                                <th data-sort="porcentaje" class="text-center">{{#str}} satisfaction, local_datacurso_ratings {{/str}}</th>
+                                <th class="text-center">{{#str}} comments, local_datacurso_ratings {{/str}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#activities}}
+                            <tr class="activity-row" data-activity="{{activity}}" {{^has_ratings}}style="opacity: 0.7;"{{/has_ratings}}>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <strong>
+                                        <a href="{{url}}" target="_blank" title="{{#str}} viewActivity, local_datacurso_ratings {{/str}}">
+                                            {{activity}}
+                                        </a>
+                                        </strong>
+                                        {{^has_ratings}}
+                                        <span class="badge bg-secondary ms-2 small">{{#str}} noRatings, local_datacurso_ratings {{/str}}</span>
+                                        {{/has_ratings}}
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary">{{total_ratings}}</span>
+                                </td>
+                                <td class="text-center">
+                                    {{#has_ratings}}
+                                    <span class="text-success fw-bold fs-5">{{likes}}</span>
+                                    {{/has_ratings}}
+                                    {{^has_ratings}}
+                                    <span class="text-muted">0</span>
+                                    {{/has_ratings}}
+                                </td>
+                                <td class="text-center">
+                                    {{#has_ratings}}
+                                    <span class="text-danger fw-bold fs-5">{{dislikes}}</span>
+                                    {{/has_ratings}}
+                                    {{^has_ratings}}
+                                    <span class="text-muted">0</span>
+                                    {{/has_ratings}}
+                                </td>
+                                <td class="text-center">
+                                    {{#has_ratings}}
+                                    <span class="badge bg-{{satisfaction_class}} fs-6">{{formatted_percentage}}</span>
+                                    {{/has_ratings}}
+                                    {{^has_ratings}}
+                                    <span class="text-muted">N/A</span>
+                                    {{/has_ratings}}
+                                </td>
+                                <td class="text-center">
+                                    {{#has_comments}}
+                                    <button type="button" class="btn btn-sm btn-outline-info expand-general-comments" 
+                                            data-target="#general-comments-{{@../index}}-{{@index}}" 
+                                            data-count="{{comments_count}}">
+                                        {{#str}} viewComments, local_datacurso_ratings {{/str}} ({{comments_count}})
+                                    </button>
+                                    {{/has_comments}}
+                                    {{^has_comments}}
+                                    <span class="text-muted">{{#str}} noComments, local_datacurso_ratings {{/str}}</span>
+                                    {{/has_comments}}
+                                </td>
+                            </tr>
+                            {{#has_comments}}
+                            <tr>
+                                <td colspan="8">
+                                    <div id="general-comments-{{@../index}}-{{@index}}" class="collapse-comments" style="display: none;">
+                                        <div class="alert alert-light m-2">
+                                            <h6><i class="fa fa-comments"></i> {{#str}} studentFeedback, local_datacurso_ratings {{/str}}:</h6>
+                                            <div class="comments-content">
+                                                {{#comments}}
+                                                <div class="border-start border-3 border-info ps-3 mb-2">
+                                                    <small class="text-muted">• {{.}}</small>
+                                                </div>
+                                                {{/comments}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{/has_comments}}
+                            {{/activities}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{/courses}}
+
+{{/has_data}}
+
+{{^has_data}}
+<!-- No Data Message -->
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="fa fa-chart-bar fa-4x text-muted"></i>
+    </div>
+    <h3 class="text-muted">{{#str}} noGlobalDataAvailable, local_datacurso_ratings {{/str}}</h3>
+    <p class="text-muted mb-4">{{#str}} noGlobalDataDescription, local_datacurso_ratings {{/str}}</p>
+    <div class="alert alert-info">
+        <h5>{{#str}} getStarted, local_datacurso_ratings {{/str}}</h5>
+        <p class="mb-0">{{#str}} getStartedDescription, local_datacurso_ratings {{/str}}</p>
+    </div>
+    <div class="mt-4">
+        <button class="btn btn-primary" onclick="location.reload()">
+            <i class="fa fa-refresh"></i> {{#str}} refresh, local_datacurso_ratings {{/str}}
+        </button>
+    </div>
+</div>
+{{/has_data}}
