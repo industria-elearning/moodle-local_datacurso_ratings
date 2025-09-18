@@ -17,14 +17,6 @@
 {{!
     @template local_datacurso_ratings/ratings_report_page
 
-    TODO describe template rating_report_page
-
-    Example context (json):
-    {
-    }
-}}
-
-{{!
     Template for displaying general ratings report (all courses)
     
     Context variables:
@@ -178,12 +170,14 @@
                                     <span class="text-muted">N/A</span>
                                     {{/has_ratings}}
                                 </td>
+                                <!-- Comentarios con modal -->
                                 <td class="text-center">
                                     {{#has_comments}}
-                                    <button type="button" class="btn btn-sm btn-outline-info expand-general-comments" 
-                                            data-target="#general-comments-{{@../index}}-{{@index}}" 
-                                            data-count="{{comments_count}}">
-                                        {{#str}} viewComments, local_datacurso_ratings {{/str}} ({{comments_count}})
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-info view-comments-modal"
+                                            data-cmid="{{cmid}}"
+                                            data-activity="{{activity}}">
+                                        {{#str}} viewComments, local_datacurso_ratings {{/str}}
                                     </button>
                                     {{/has_comments}}
                                     {{^has_comments}}
@@ -191,24 +185,6 @@
                                     {{/has_comments}}
                                 </td>
                             </tr>
-                            {{#has_comments}}
-                            <tr>
-                                <td colspan="8">
-                                    <div id="general-comments-{{@../index}}-{{@index}}" class="collapse-comments" style="display: none;">
-                                        <div class="alert alert-light m-2">
-                                            <h6><i class="fa fa-comments"></i> {{#str}} studentFeedback, local_datacurso_ratings {{/str}}:</h6>
-                                            <div class="comments-content">
-                                                {{#comments}}
-                                                <div class="border-start border-3 border-info ps-3 mb-2">
-                                                    <small class="text-muted">• {{.}}</small>
-                                                </div>
-                                                {{/comments}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            {{/has_comments}}
                             {{/activities}}
                         </tbody>
                     </table>

@@ -24,19 +24,21 @@
 
 require_once('../../../config.php');
 
-// Get course ID parameter
+// Get course ID parameter.
 $courseid = required_param('id', PARAM_INT);
 
-// Verify course exists
-$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+// Verify course exists.
+$course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 
-// Security checks
+// Security checks.
 require_login($course);
 $context = context_course::instance($course->id);
-require_capability('moodle/course:view', $context);
 
-// Set up page
-$PAGE->set_url('/local/datacurso_ratings/admin/report_ratings_course.php', array('id' => $courseid));
+// Access for teachers and managers.
+require_capability('local/datacurso_ratings:viewreports', $context);
+
+// Set up page.
+$PAGE->set_url('/local/datacurso_ratings/admin/report_ratings_course.php', ['id' => $courseid]);
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_title(get_string('activityratingsreport', 'local_datacurso_ratings'));
 $PAGE->set_heading($course->fullname);
@@ -45,10 +47,11 @@ $PAGE->navbar->add(get_string('activityratingsreport', 'local_datacurso_ratings'
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('activityratingsreport', 'local_datacurso_ratings'));
 
-// Container for the report (will be populated by JavaScript)
+// Container for the report (will be populated by JavaScript).
 echo '<div id="ratings-report-container"></div>';
 
-// Initialize the JavaScript module
+// Initialize the JavaScript module.
 $PAGE->requires->js_call_amd('local_datacurso_ratings/ratings_report_course', 'init', [$courseid]);
+$PAGE->requires->js_call_amd('local_datacurso_ratings/comments_modal', 'init');
 
 echo $OUTPUT->footer();

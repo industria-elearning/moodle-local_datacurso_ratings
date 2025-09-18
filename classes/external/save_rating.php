@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace local_datacurso_ratings\external;
 
 use external_api;
@@ -14,9 +29,19 @@ require_once($CFG->libdir . '/externallib.php');
 
 /**
  * External function to save a rating for a course module.
+ *
+ * @package    local_datacurso_ratings
+ * @category   external
+ * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_rating extends external_api {
 
+    /**
+     * Define the expected parameters for the service.
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'cmid' => new external_value(PARAM_INT, 'Course module id'),
@@ -25,6 +50,15 @@ class save_rating extends external_api {
         ]);
     }
 
+    /**
+     * Save a rating for the given course module.
+     *
+     * @param int $cmid Course module id
+     * @param int $rating Rating value (0 or 1)
+     * @param string $feedback Optional feedback
+     * @return array Status of the operation
+     * @throws invalid_parameter_exception If rating value is invalid
+     */
     public static function execute(int $cmid, int $rating, string $feedback = ''): array {
         global $DB, $USER;
 
@@ -46,8 +80,10 @@ class save_rating extends external_api {
         }
 
         $now = time();
-        $record = $DB->get_record('local_datacurso_ratings',
-            ['cmid' => $cm->id, 'userid' => $USER->id]);
+        $record = $DB->get_record(
+            'local_datacurso_ratings',
+            ['cmid' => $cm->id, 'userid' => $USER->id]
+        );
 
         $data = (object)[
             'cmid' => $cm->id,
@@ -68,6 +104,11 @@ class save_rating extends external_api {
         return ['status' => true];
     }
 
+    /**
+     * Define the return structure of the service.
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'status' => new external_value(PARAM_BOOL, 'Operation status'),

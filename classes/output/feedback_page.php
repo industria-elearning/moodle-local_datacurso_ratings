@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class feedback_page
+ * Class feedback_page.
  *
  * @package    local_datacurso_ratings
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
@@ -28,13 +28,34 @@ use renderable;
 use templatable;
 use renderer_base;
 use stdClass;
+
+/**
+ * Feedback page class for rendering ratings feedback.
+ *
+ * @package    local_datacurso_ratings
+ */
 class feedback_page implements renderable, templatable {
+
+    /**
+     * @var array Feedback items.
+     */
     private $items;
+
+    /**
+     * Constructor.
+     */
     public function __construct() {
         global $DB;
         $records = $DB->get_records('local_datacurso_ratings_feedback', null, 'id DESC');
         $this->items = array_values($records);
     }
+
+    /**
+     * Export data for mustache template.
+     *
+     * @param renderer_base $output The renderer.
+     * @return array Data to render template.
+     */
     public function export_for_template(renderer_base $output) {
         $items = [];
         foreach ($this->items as $rec) {
@@ -46,7 +67,7 @@ class feedback_page implements renderable, templatable {
 
         return [
             'items' => $items,
-            'sesskey' => sesskey()
+            'sesskey' => sesskey(),
         ];
     }
 }

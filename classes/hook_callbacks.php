@@ -1,14 +1,31 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_datacurso_ratings;
-
-defined('MOODLE_INTERNAL') || die();
 
 use core\hook\output\before_footer_html_generation;
 use context_module;
 
 /**
  * Hook callbacks for local_datacurso_ratings.
+ *
+ * @package    local_datacurso_ratings
+ * @category   hook
+ * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class hook_callbacks {
 
@@ -43,6 +60,11 @@ class hook_callbacks {
 
         $cm = $PAGE->cm;
 
+        // Check if the plugin is enabled in global settings.
+        if (!get_config('local_datacurso_ratings', 'enabled')) {
+            return; // If disabled, do not inject anything.
+        }
+
         // Exportar datos para el template.
         $feedbackpage = new \local_datacurso_ratings\output\feedback_page();
         $feedbackdata = $feedbackpage->export_for_template($OUTPUT);
@@ -54,7 +76,7 @@ class hook_callbacks {
                 ['feedbacktext' => 'Muy útil'],
                 ['feedbacktext' => 'Bien explicado'],
                 ['feedbacktext' => 'Interesante'],
-                ],
+            ],
             'dislikeItems' => $feedbackdata['items'],
         ]);
 

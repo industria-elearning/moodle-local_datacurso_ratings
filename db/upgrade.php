@@ -35,7 +35,7 @@ function xmldb_local_datacurso_ratings_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-      if ($oldversion < 2025091000) {
+    if ($oldversion < 2025091000) {
 
         // Define table local_datacurso_ratings_feedback to be created.
         $table = new xmldb_table('local_datacurso_ratings_feedback');

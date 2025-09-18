@@ -34,13 +34,13 @@ $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('ratingsreport', 'local_datacurso_ratings'));
 $PAGE->set_heading(get_string('ratingsreport', 'local_datacurso_ratings'));
 
-// IMPORTANTE: Header ANTES del contenido
+// IMPORTANT: Header before content.
 echo $OUTPUT->header();
 
-// Contenedor para el reporte (será llenado por JavaScript)
+// Container for the report (will be populated by JavaScript).
 echo '<div id="general-ratings-report-container"></div>';
 
-// Inicializar el JavaScript module
 $PAGE->requires->js_call_amd('local_datacurso_ratings/ratings_report', 'init', []);
+$PAGE->requires->js_call_amd('local_datacurso_ratings/comments_modal', 'init');
 
 echo $OUTPUT->footer();

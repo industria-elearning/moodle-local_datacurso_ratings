@@ -135,9 +135,13 @@
                     <span class="text-muted">N/A</span>
                     {{/has_ratings}}
                 </td>
+                 <!-- Comentarios con modal -->
                 <td class="text-center">
                     {{#has_comments}}
-                    <button type="button" class="btn btn-sm btn-outline-info expand-comments" data-target="#comments-{{@index}}">
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-info view-comments-modal"
+                            data-cmid="{{cmid}}"
+                            data-activity="{{activity}}">
                         {{#str}} viewComments, local_datacurso_ratings {{/str}}
                     </button>
                     {{/has_comments}}
@@ -146,20 +150,6 @@
                     {{/has_comments}}
                 </td>
             </tr>
-            {{#has_comments}}
-            <tr>
-                <td colspan="7">
-                    <div id="comments-{{@index}}" class="collapse-comments" style="display: none;">
-                        <div class="alert alert-light mt-2">
-                            <h6>{{#str}} studentFeedback, local_datacurso_ratings {{/str}}:</h6>
-                            <div class="comments-content">
-                                {{#str}} comments, local_datacurso_ratings {{/str}}: {{comentarios}}
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            {{/has_comments}}
             {{/activities}}
         </tbody>
     </table>

@@ -31,9 +31,9 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('managefeedback', 'local_datacurso_ratings'));
 $PAGE->set_heading(get_string('managefeedback', 'local_datacurso_ratings'));
 
-
 echo $OUTPUT->header();
-// Renderable + Renderer
+
+// Renderable + Renderer.
 $renderable = new \local_datacurso_ratings\output\feedback_page();
 echo $OUTPUT->render($renderable);
 echo $OUTPUT->footer();

@@ -1,0 +1,155 @@
+{{!
+    Template for comments modal content
+    
+    Context variables:
+    * comments - Array of comments
+    * pagination - Pagination info
+    * statistics - Comment statistics
+    * activity - Activity info
+    * search_term - Current search term
+}}
+
+<!-- Statistics Section -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6 class="mb-0 text-primary">{{statistics.total_comments}}</h6>
+                <small class="text-muted">{{#str}} totalComments, local_datacurso_ratings {{/str}}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6 class="mb-0 text-success">{{statistics.like_comments}}</h6>
+                <small class="text-muted">👍 {{#str}} positiveComments, local_datacurso_ratings {{/str}}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6 class="mb-0 text-danger">{{statistics.dislike_comments}}</h6>
+                <small class="text-muted">👎 {{#str}} negativeComments, local_datacurso_ratings {{/str}}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Keywords Section -->
+{{#statistics.keywords}}
+{{#.}}
+<div class="mb-3">
+    <h6>{{#str}} frequentWords, local_datacurso_ratings {{/str}}:</h6>
+    <div class="d-flex flex-wrap gap-1">
+        {{#statistics.keywords}}
+        <span class="badge bg-secondary keyword-filter" style="cursor: pointer;" title="{{frequency}} veces">
+            {{word}} ({{frequency}})
+        </span>
+        {{/statistics.keywords}}
+    </div>
+</div>
+{{/.}}
+{{/statistics.keywords}}
+
+<!-- Search Section -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fa fa-search"></i></span>
+            <input type="text" class="form-control" id="comments-search" 
+                   placeholder="{{#str}} searchInComments, local_datacurso_ratings {{/str}}" 
+                   value="{{search_term}}">
+            <button class="btn btn-outline-secondary" type="button" id="clear-search">
+                <i class="fa fa-times"></i> {{#str}} clear, local_datacurso_ratings {{/str}}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Comments Table -->
+<div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+    <table class="table table-striped table-sm">
+        <thead class="table-dark sticky-top">
+            <tr>
+                <th style="width: 10%;">{{#str}} rating, local_datacurso_ratings {{/str}}</th>
+                <th style="width: 70%;">{{#str}} comment, local_datacurso_ratings {{/str}}</th>
+                <th style="width: 20%;">{{#str}} date, local_datacurso_ratings {{/str}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#comments}}
+            <tr>
+                <td class="text-center">
+                    {{#rating}}
+                    <span class="badge bg-success">👍</span>
+                    {{/rating}}
+                    {{^rating}}
+                    <span class="badge bg-danger">👎</span>
+                    {{/rating}}
+                </td>
+                <td>
+                    <div class="comment-text" style="max-height: 100px; overflow-y: auto;">
+                        {{feedback}}
+                    </div>
+                </td>
+                <td>
+                    <small class="text-muted">{{date}}</small>
+                </td>
+            </tr>
+            {{/comments}}
+            {{^comments}}
+            <tr>
+                <td colspan="3" class="text-center text-muted py-4">
+                    {{#str}} noCommentsFound, local_datacurso_ratings {{/str}}
+                </td>
+            </tr>
+            {{/comments}}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{{#pagination.totalpages}}
+{{#.}}
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+        <small class="text-muted">
+            {{#str}} showing, local_datacurso_ratings {{/str}} 
+            {{#pagination.page}}{{.}}{{/pagination.page}} 
+            {{#str}} of, local_datacurso_ratings {{/str}} 
+            {{pagination.totalpages}} 
+            {{#str}} pages, local_datacurso_ratings {{/str}}
+            ({{pagination.total}} {{#str}} total, local_datacurso_ratings {{/str}})
+        </small>
+    </div>
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            {{#pagination.page}}
+            <li class="page-item {{^.}}disabled{{/.}}">
+                <a class="page-link comments-pagination" href="#" data-page="{{#.}}{{.}}{{/.}}{{^.}}0{{/.}}" data-page="0">
+                    {{#str}} previous, local_datacurso_ratings {{/str}}
+                </a>
+            </li>
+            {{/pagination.page}}
+            
+            <!-- Generate page numbers -->
+            {{#pagination.totalpages}}
+                {{#pages}}
+                <li class="page-item {{#current}}active{{/current}}">
+                    <a class="page-link comments-pagination" href="#" data-page="{{number}}">{{display}}</a>
+                </li>
+                {{/pages}}
+            {{/pagination.totalpages}}
+            
+            <li class="page-item {{^pagination.hasmore}}disabled{{/pagination.hasmore}}">
+                <a class="page-link comments-pagination" href="#" data-page="{{pagination.next_page}}">
+                    {{#str}} next, local_datacurso_ratings {{/str}}
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+{{/.}}
+{{/pagination.totalpages}}

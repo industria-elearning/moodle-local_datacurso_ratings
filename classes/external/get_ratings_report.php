@@ -28,12 +28,18 @@ use external_api;
 use context_system;
 
 /**
- * Webservice para traer el reporte general de actividades con ratings
+ * Webservice para traer el reporte general de actividades con ratings.
+ *
+ * @package    local_datacurso_ratings
+ * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_ratings_report extends external_api {
 
     /**
      * Parámetros de entrada de la función.
+     *
+     * @return external_function_parameters
      */
     public static function execute_parameters() {
         return new external_function_parameters([]);
@@ -41,6 +47,8 @@ class get_ratings_report extends external_api {
 
     /**
      * Lógica principal: consulta y devuelve la información.
+     *
+     * @return array
      */
     public static function execute() {
         global $DB;
@@ -89,9 +97,9 @@ class get_ratings_report extends external_api {
                 continue; // Saltar si el usuario no tiene permiso de verlo.
             }
 
-            $commentsArray = [];
+            $commentsarray = [];
             if (!empty($r->comentarios)) {
-                $commentsArray = explode(' / ', $r->comentarios);
+                $commentsarray = explode(' / ', $r->comentarios);
             }
 
             $result[] = [
@@ -103,7 +111,7 @@ class get_ratings_report extends external_api {
                 'likes' => (int)$r->likes,
                 'dislikes' => (int)$r->dislikes,
                 'approvalpercent' => (float)$r->porcentaje_aprobacion,
-                'comments' => $commentsArray,
+                'comments' => $commentsarray,
             ];
         }
 
@@ -112,6 +120,8 @@ class get_ratings_report extends external_api {
 
     /**
      * Estructura de salida.
+     *
+     * @return external_multiple_structure
      */
     public static function execute_returns() {
         return new external_multiple_structure(
@@ -126,7 +136,8 @@ class get_ratings_report extends external_api {
                 'approvalpercent' => new external_value(PARAM_FLOAT, '% de aprobación'),
                 'comments' => new external_multiple_structure(
                     new external_value(PARAM_RAW, 'Comentario individual'),
-                    'Lista de comentarios', VALUE_OPTIONAL
+                    'Lista de comentarios',
+                    VALUE_OPTIONAL
                 ),
             ])
         );

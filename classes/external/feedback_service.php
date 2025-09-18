@@ -16,16 +16,6 @@
 
 namespace local_datacurso_ratings\external;
 
-/**
- * Class feedback_service
- *
- * @package    local_datacurso_ratings
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-defined('MOODLE_INTERNAL') || die();
-
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -33,10 +23,11 @@ use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use context_system;
 
-/**
- * Servicio para gestionar feedback en Datacurso Ratings.
+/** Class feedback_service
  *
  * @package    local_datacurso_ratings
+ * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedback_service extends external_api {
 

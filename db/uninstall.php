@@ -25,8 +25,9 @@
 
 /**
  * Custom uninstallation procedure.
+ *
+ * @return bool
  */
 function xmldb_local_datacurso_ratings_uninstall() {
-
     return true;
 }

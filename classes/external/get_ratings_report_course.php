@@ -29,25 +29,38 @@ use context_course;
 use core\context;
 use moodle_exception;
 
+/**
+ * Servicio externo para obtener el reporte de valoraciones a nivel de curso.
+ *
+ * @package    local_datacurso_ratings
+ * @category   external
+ * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class get_ratings_report_course extends external_api {
 
     /**
      * Parámetros de entrada de la función.
+     *
+     * @return external_function_parameters
      */
     public static function execute_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'ID del curso')
+            'courseid' => new external_value(PARAM_INT, 'ID del curso'),
         ]);
     }
 
     /**
      * Lógica principal: consulta y devuelve la información.
+     *
+     * @param int $courseid ID del curso
+     * @return array
      */
     public static function execute($courseid) {
         global $DB, $USER;
 
         $params = self::validate_parameters(self::execute_parameters(), [
-            'courseid' => $courseid
+            'courseid' => $courseid,
         ]);
 
         $context = context_course::instance($params['courseid']);
@@ -66,10 +79,13 @@ class get_ratings_report_course extends external_api {
 
             // Traer las valoraciones de esta actividad.
             $sql = "
-                SELECT 
+                SELECT
                     SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
                     SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes,
-                    ROUND(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(r.id),0), 1) AS porcentaje_aprobacion,
+                    ROUND(
+                        SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(r.id), 0),
+                        1
+                    ) AS porcentaje_aprobacion,
                     GROUP_CONCAT(DISTINCT r.feedback SEPARATOR ' / ') AS comentarios
                 FROM {local_datacurso_ratings} r
                 WHERE r.cmid = :cmid
@@ -100,6 +116,8 @@ class get_ratings_report_course extends external_api {
 
     /**
      * Estructura de salida.
+     *
+     * @return external_multiple_structure
      */
     public static function execute_returns() {
         return new external_multiple_structure(

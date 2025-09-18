@@ -15,28 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Callback implementations for Datacurso Ratings
+ * Callback implementations for Datacurso Ratings.
  *
  * @package    local_datacurso_ratings
  * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Extiende la lista de informes del curso.
  *
- * @param navigation_node $navigation
- * @param stdClass $course
- * @param context_course $context
+ * @param navigation_node $navigation The navigation node.
+ * @param stdClass $course The course object.
+ * @param context_course $context The course context.
  */
 function local_datacurso_ratings_extend_navigation_course($navigation, $course, $context) {
-    if (has_capability('moodle/course:view', $context)) {
-        // Buscar específicamente el nodo de "Informes"
+    // Solo profesores y managers pueden ver el reporte.
+    if (has_capability('local/datacurso_ratings:viewreports', $context)) {
+        // Buscar específicamente el nodo de "Informes".
         $reportsnode = $navigation->get('coursereports');
         if ($reportsnode) {
-            $url = new moodle_url('/local/datacurso_ratings/admin/report_ratings_course.php', ['id' => $course->id]);
+            $url = new moodle_url(
+                '/local/datacurso_ratings/admin/report_ratings_course.php',
+                ['id' => $course->id]
+            );
             $reportsnode->add(
                 get_string('activityratingsreport', 'local_datacurso_ratings'),
                 $url,

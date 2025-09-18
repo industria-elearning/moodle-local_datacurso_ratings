@@ -25,8 +25,9 @@
 
 /**
  * Custom code to be run on installing the plugin.
+ *
+ * @return bool Always returns true.
  */
-function xmldb_local_datacurso_ratings_install() {
-
+function xmldb_local_datacurso_ratings_install(): bool {
     return true;
 }
