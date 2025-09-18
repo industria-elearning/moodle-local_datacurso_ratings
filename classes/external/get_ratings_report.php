@@ -104,6 +104,7 @@ class get_ratings_report extends external_api {
 
             $result[] = [
                 'course' => $modinfo->get_course()->fullname,
+                'categoryid' => $modinfo->get_course()->category,
                 'activity' => $cm->name,
                 'modname' => $cm->modname,
                 'cmid' => $cm->id,
@@ -127,6 +128,7 @@ class get_ratings_report extends external_api {
         return new external_multiple_structure(
             new external_single_structure([
                 'course' => new external_value(PARAM_TEXT, 'Nombre del curso'),
+                'categoryid' => new external_value(PARAM_INT, 'ID de la categoría del curso'),
                 'activity' => new external_value(PARAM_TEXT, 'Nombre de la actividad'),
                 'modname' => new external_value(PARAM_TEXT, 'Tipo de módulo'),
                 'cmid' => new external_value(PARAM_INT, 'Course module ID'),

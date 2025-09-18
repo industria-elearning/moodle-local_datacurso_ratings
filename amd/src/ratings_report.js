@@ -14,10 +14,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module get_ratings_report
+ * General ratings report JS
  *
  * @module     local_datacurso_ratings/ratings_report
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -25,7 +25,7 @@
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
 import Notification from 'core/notification';
-import {get_string as getString} from 'core/str';
+import { get_string as getString } from 'core/str';
 
 /**
  * Initialize the general ratings report
@@ -36,6 +36,14 @@ export const init = () => {
         return;
     }
 
+    // Leer categorías desde el data-attribute
+    let categories = [];
+    try {
+        categories = JSON.parse(container.dataset.categories || '[]');
+    } catch (e) {
+        console.warn("No se pudieron parsear las categorías", e);
+    }
+
     // Show loading state
     showLoading(container);
 
@@ -44,32 +52,33 @@ export const init = () => {
         methodname: 'local_datacurso_ratings_get_ratings_report',
         args: {}
     }])[0]
-    .then((data) => {
-        return processGeneralReportData(data);
-    })
-    .then((templateData) => {
-        return Templates.render('local_datacurso_ratings/ratings_report_page', templateData);
-    })
-    .then((html, js) => {
-        // Replace loading with actual content
-        container.innerHTML = html;
-        Templates.runTemplateJS(js);
-        
-        // Initialize additional functionality
-        initGeneralTableFeatures();
-    })
-    .catch((error) => {
-        console.error('Error loading general ratings report:', error);
-        showError(container, error);
-    });
+        .then((data) => {
+            return processGeneralReportData(data, categories);
+        })
+        .then((templateData) => {
+            return Templates.render('local_datacurso_ratings/ratings_report_page', templateData);
+        })
+        .then((html, js) => {
+            // Replace loading with actual content
+            container.innerHTML = html;
+            Templates.runTemplateJS(js);
+
+            // Initialize additional functionality
+            initGeneralTableFeatures();
+        })
+        .catch((error) => {
+            console.error('Error loading general ratings report:', error);
+            showError(container, error);
+        });
 };
 
 /**
  * Process the raw data from web service
  * @param {Array} data Raw data from web service
+ * @param {Array} categories List of categories from PHP
  * @returns {Object} Processed data for template
  */
-function processGeneralReportData(data) {
+function processGeneralReportData(data, categories) {
     // Group data by course
     const courseGroups = {};
     let totalLikes = 0;
@@ -78,10 +87,11 @@ function processGeneralReportData(data) {
 
     data.forEach(activity => {
         const courseName = activity.course;
-        
+
         if (!courseGroups[courseName]) {
             courseGroups[courseName] = {
                 courseName: courseName,
+                categoryid: activity.categoryid || '', // <= importante para filtro
                 activities: [],
                 courseLikes: 0,
                 courseDislikes: 0,
@@ -116,11 +126,11 @@ function processGeneralReportData(data) {
     Object.keys(courseGroups).forEach(courseName => {
         const course = courseGroups[courseName];
         const courseTotal = course.courseLikes + course.courseDislikes;
-        course.courseSatisfaction = courseTotal > 0 ? 
+        course.courseSatisfaction = courseTotal > 0 ?
             ((course.courseLikes / courseTotal) * 100).toFixed(1) : '0';
         course.courseSatisfactionClass = getSatisfactionClass(parseFloat(course.courseSatisfaction));
         course.courseTotal = courseTotal;
-        
+
         // Sort activities by satisfaction percentage (highest first)
         course.activities.sort((a, b) => b.approvalpercent - a.approvalpercent);
     });
@@ -134,6 +144,7 @@ function processGeneralReportData(data) {
     return {
         courses: coursesArray,
         has_data: coursesArray.length > 0,
+        categories: categories, // <= aquí se pasa al mustache
         summary: {
             total_courses: coursesArray.length,
             total_activities: totalActivities,
@@ -196,10 +207,10 @@ function initGeneralTableFeatures() {
     // Course collapse/expand functionality
     document.querySelectorAll('.course-toggle').forEach(button => {
         button.addEventListener('click', (e) => {
-            const target = e.target.getAttribute('data-target');
+            const target = button.getAttribute('data-target');
             const courseContent = document.querySelector(target);
-            const icon = e.target.querySelector('i');
-            
+            const icon = button.querySelector('i');
+
             if (courseContent.classList.contains('show')) {
                 courseContent.classList.remove('show');
                 icon.classList.remove('fa-chevron-down');
@@ -208,22 +219,6 @@ function initGeneralTableFeatures() {
                 courseContent.classList.add('show');
                 icon.classList.remove('fa-chevron-right');
                 icon.classList.add('fa-chevron-down');
-            }
-        });
-    });
-
-    // Comments expand functionality
-    document.querySelectorAll('.expand-general-comments').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const target = e.target.getAttribute('data-target');
-            const commentsDiv = document.querySelector(target);
-            
-            if (commentsDiv.style.display === 'none' || !commentsDiv.style.display) {
-                commentsDiv.style.display = 'block';
-                e.target.textContent = 'Ocultar comentarios';
-            } else {
-                commentsDiv.style.display = 'none';
-                e.target.textContent = 'Ver comentarios (' + e.target.getAttribute('data-count') + ')';
             }
         });
     });
@@ -238,14 +233,62 @@ function initGeneralTableFeatures() {
 function initFilterFeatures() {
     const searchInput = document.querySelector('#activity-search');
     const courseFilter = document.querySelector('#course-filter');
-    
+    const categoryFilter = document.querySelector('#category-filter');
+
     if (searchInput) {
         searchInput.addEventListener('input', filterActivities);
     }
-    
+
     if (courseFilter) {
         courseFilter.addEventListener('change', filterActivities);
     }
+
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', () => {
+            // 1. Filtrar actividades
+            filterActivities();
+
+            // 2. Cargar cursos por categoría seleccionada
+            const categoryid = categoryFilter.value || '';
+            updateCoursesByCategory(categoryid);
+        });
+    }
+}
+
+/**
+ * Llama al WS para traer cursos de una categoría y actualizar el selector de cursos
+ * @param {String|Number} categoryid
+ */
+function updateCoursesByCategory(categoryid) {
+    const courseFilter = document.querySelector('#course-filter');
+    if (!courseFilter) {
+        return;
+    }
+
+    // Si no hay categoría seleccionada, reseteamos a "Todos los cursos"
+    if (categoryid === '') {
+        courseFilter.innerHTML = `<option value="">Todos los cursos</option>`;
+        return;
+    }
+
+    Ajax.call([{
+        methodname: 'local_datacurso_ratings_get_courses_by_category',
+        args: { categoryid: categoryid }
+    }])[0]
+        .then((courses) => {
+            // Resetear opciones
+            courseFilter.innerHTML = `<option value="">Todos los cursos</option>`;
+
+            if (courses && courses.length) {
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.fullname;
+                    option.textContent = course.fullname;
+                    courseFilter.appendChild(option);
+                });
+            }
+        })
+        .catch(Notification.exception);
 }
 
 /**
@@ -254,17 +297,23 @@ function initFilterFeatures() {
 function filterActivities() {
     const searchTerm = document.querySelector('#activity-search')?.value.toLowerCase() || '';
     const selectedCourse = document.querySelector('#course-filter')?.value || '';
-    
+    const selectedCategory = document.querySelector('#category-filter')?.value || '';
+
     document.querySelectorAll('.course-section').forEach(section => {
-        const courseName = section.getAttribute('data-course');
+        const courseId = section.getAttribute('data-course');
+        const categoryId = section.getAttribute('data-category');
         let courseVisible = false;
-        
-        // Check if course matches filter
-        if (selectedCourse === '' || courseName === selectedCourse) {
+
+        // Verificar categoría
+        const matchesCategory = selectedCategory === '' || categoryId === selectedCategory;
+
+        if (matchesCategory && (selectedCourse === '' || courseId === selectedCourse)) {
+            // courseId y selectedCourse son strings con el nombre del curso
+
             section.querySelectorAll('.activity-row').forEach(row => {
                 const activityName = row.getAttribute('data-activity').toLowerCase();
                 const matchesSearch = searchTerm === '' || activityName.includes(searchTerm);
-                
+
                 if (matchesSearch) {
                     row.style.display = '';
                     courseVisible = true;
@@ -272,11 +321,12 @@ function filterActivities() {
                     row.style.display = 'none';
                 }
             });
+        } else {
+            courseVisible = false;
         }
-        
-        // Show/hide entire course section
+
         section.style.display = courseVisible ? '' : 'none';
     });
 }
 
-export default {init};
+export default { init };

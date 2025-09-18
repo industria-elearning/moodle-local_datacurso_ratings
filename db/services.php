@@ -75,4 +75,12 @@ $functions = [
         'type'        => 'read',
         'ajax'        => true,
     ],
+    'local_datacurso_ratings_get_courses_by_category' => [
+        'classname'   => 'local_datacurso_ratings\external\get_courses_by_category',
+        'methodname'  => 'execute',
+        'classpath'   => '',
+        'description' => 'Obtiene los cursos de una categoria.',
+        'type'        => 'read',
+        'ajax'        => true,
+    ],
 ];

@@ -92,10 +92,10 @@ export function init() {
 
                 // Agregar dinámicamente a la lista
                 const li = document.createElement("li");
-                li.className = "feedback-item";
+                li.className = "feedback-item list-group-item d-flex justify-content-between align-items-center";
                 li.innerHTML = `
-                    ${input.value}
-                    <button class="btn-delete" data-id="${resp.id}">✖️</button>
+                    <span class="feedback-text">${input.value}</span>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-delete" data-id="${resp.id}">X</button>
                 `;
                 list.prepend(li);
                 input.value = "";

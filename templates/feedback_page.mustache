@@ -28,24 +28,25 @@
 
     <h4>Datacurso Ratings</h4>
 
-    <form class="feedback-form">
-        <input type="text" name="feedbacktext" placeholder="Agrega una respuesta preestablecida" required>
-        <button type="submit">Agregar</button>
+    <form class="feedback-form d-flex gap-5 mb-3">
+        <input type="text" name="feedbacktext" class="form-control mr-2" placeholder="Agrega una respuesta preestablecida" required>
+        <button type="submit" class="btn btn-primary">Agregar</button>
     </form>
 
-    <ul class="feedback-list">
+    <ul class="feedback-list list-group">
         {{#items}}
-            <li class="feedback-item">
+            <li class="feedback-item list-group-item d-flex justify-content-between align-items-center">
                 <span class="feedback-text">{{feedbacktext}}</span>
-                <button type="button" class="btn-delete" data-id="{{id}}">✖️</button>
+                <button type="button" class="btn btn-outline-danger btn-sm btn-delete" data-id="{{id}}"> X </button>
             </li>
         {{/items}}
 
         {{^items}}
-            <li>No hay frases registradas aún.</li>
+            <li class="list-group-item text-muted">No hay frases registradas aún.</li>
         {{/items}}
     </ul>
 </div>
+
 {{#js}}
 require(['local_datacurso_ratings/feedback'], function(module) {
     module.init();

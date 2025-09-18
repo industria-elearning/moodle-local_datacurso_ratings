@@ -34,11 +34,23 @@ $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('ratingsreport', 'local_datacurso_ratings'));
 $PAGE->set_heading(get_string('ratingsreport', 'local_datacurso_ratings'));
 
-// IMPORTANT: Header before content.
+// Obtenemos las categorías.
+$categorieslist = core_course_category::make_categories_list();
+$categories = [];
+foreach ($categorieslist as $id => $name) {
+    $categories[] = [
+        'id' => $id,
+        'name' => $name,
+        'isdefault' => ($id == 1),
+    ];
+}
+
+// Renderizamos el template.
 echo $OUTPUT->header();
 
-// Container for the report (will be populated by JavaScript).
-echo '<div id="general-ratings-report-container"></div>';
+echo '<div id="general-ratings-report-container"
+          data-categories="' . htmlentities(json_encode($categories)) . '">
+      </div>';
 
 $PAGE->requires->js_call_amd('local_datacurso_ratings/ratings_report', 'init', []);
 $PAGE->requires->js_call_amd('local_datacurso_ratings/comments_modal', 'init');
