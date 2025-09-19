@@ -38,6 +38,8 @@ class get_activity_comments extends external_api {
 
     /**
      * Function input parameters.
+     *
+     * @return external_function_parameters
      */
     public static function execute_parameters() {
         return new external_function_parameters([
@@ -50,6 +52,12 @@ class get_activity_comments extends external_api {
 
     /**
      * Main logic: get paginated comments and statistics.
+     *
+     * @param int $cmid Course module ID
+     * @param int $page Page number
+     * @param int $perpage Items per page
+     * @param string $search Optional search text
+     * @return array Comments, pagination, statistics and activity information
      */
     public static function execute($cmid, $page = 0, $perpage = 20, $search = '') {
         global $DB;
@@ -129,6 +137,10 @@ class get_activity_comments extends external_api {
 
     /**
      * Calculate comment statistics.
+     *
+     * @param int $cmid Course module ID
+     * @param string $search Optional search text
+     * @return array Statistics data (totals, averages, keywords)
      */
     private static function calculate_statistics($cmid, $search = '') {
         global $DB;
@@ -181,6 +193,12 @@ class get_activity_comments extends external_api {
 
     /**
      * Extract most frequent keywords.
+     *
+     * @param string $text Text to analyze
+     * @return array List of keywords with their frequency.
+     *               Each element is an associative array:
+     *               - word (string) Keyword
+     *               - frequency (int) Word frequency
      */
     private static function extract_keywords($text) {
         // Words to ignore (stop words in Spanish and English).
@@ -225,6 +243,8 @@ class get_activity_comments extends external_api {
 
     /**
      * Structure of exit.
+     *
+     * @return external_single_structure
      */
     public static function execute_returns() {
         return new external_single_structure([

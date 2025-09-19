@@ -11,20 +11,20 @@
     border: 1px solid #dee2e6;
     border-radius: 0.5rem;
     padding: 1rem;
-    margin-top: 0.5rem !important;
+    margin-top: 0.5rem;
 }
 
 /* Contenedor de botones Like/Dislike */
 .local-dcr-options {
-    display: flex !important;
-    gap: 0.5rem !important;
-    align-items: center !important;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
     justify-content: flex-start;
 }
 
 /* Área de feedback */
 .local-dcr-feedback {
-    margin-top: 0.5rem !important;
+    margin-top: 0.5rem;
     padding-top: 0.5rem;
     border-top: 1px solid #dee2e6;
 }
@@ -67,11 +67,9 @@
     .local-dcr-options {
         justify-content: center;
     }
-    
     .local-dcr-actions {
         flex-direction: column;
     }
-    
     .local-dcr-actions button {
         width: 100%;
     }
