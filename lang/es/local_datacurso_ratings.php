@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['actions'] = 'Acciones';
+$string['activities'] = 'Activitidades';
 $string['activity'] = 'Actividad';
 $string['activityratingsreport'] = 'Reporte de valoraciones de actividades/recursos';
 $string['addfeedback'] = 'Nueva retroalimentación o respuesta predefinida';

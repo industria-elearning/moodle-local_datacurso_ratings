@@ -240,16 +240,32 @@ function initFilterFeatures() {
     }
 
     if (courseFilter) {
-        courseFilter.addEventListener('change', filterActivities);
+        courseFilter.addEventListener('input', filterActivities);
     }
 
     if (categoryFilter) {
-        categoryFilter.addEventListener('change', () => {
+        categoryFilter.addEventListener('input', () => {
+            // Obtener el ID de la categoría seleccionada
+            const selectedName = categoryFilter.value;
+            let categoryid = '';
+            
+            // Buscar el ID correspondiente al nombre seleccionado
+            const datalist = document.querySelector('#categories');
+            const options = datalist.querySelectorAll('option');
+            
+            options.forEach(option => {
+                if (option.value === selectedName) {
+                    categoryid = option.getAttribute('data-id') || '';
+                }
+            });
+            
+            // Guardar el ID en un data attribute
+            categoryFilter.setAttribute('data-category-id', categoryid);
+            
             // 1. Filtrar actividades
             filterActivities();
-
+            
             // 2. Cargar cursos por categoría seleccionada
-            const categoryid = categoryFilter.value || '';
             updateCoursesByCategory(categoryid);
         });
     }
@@ -261,34 +277,35 @@ function initFilterFeatures() {
  */
 function updateCoursesByCategory(categoryid) {
     const courseFilter = document.querySelector('#course-filter');
-    if (!courseFilter) {
+    const coursesDatalist = document.querySelector('#courses');
+    
+    if (!courseFilter || !coursesDatalist) {
         return;
     }
 
-    // Si no hay categoría seleccionada, reseteamos a "Todos los cursos"
+    // Limpiar el input y datalist
+    courseFilter.value = '';
+    coursesDatalist.innerHTML = '<option value="Todos los cursos">Todos los cursos</option>';
+
     if (categoryid === '') {
-        courseFilter.innerHTML = `<option value="">Todos los cursos</option>`;
         return;
     }
 
     Ajax.call([{
         methodname: 'local_datacurso_ratings_get_courses_by_category',
-        args: { categoryid: categoryid }
+        args: { categoryid: parseInt(categoryid) }
     }])[0]
-        .then((courses) => {
-            // Resetear opciones
-            courseFilter.innerHTML = `<option value="">Todos los cursos</option>`;
-
-            if (courses && courses.length) {
-                courses.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.fullname;
-                    option.textContent = course.fullname;
-                    courseFilter.appendChild(option);
-                });
-            }
-        })
-        .catch(Notification.exception);
+    .then((courses) => {
+        if (courses && courses.length) {
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.fullname;
+                option.textContent = course.fullname;
+                coursesDatalist.appendChild(option);
+            });
+        }
+    })
+    .catch(Notification.exception);
 }
 
 /**
@@ -297,7 +314,8 @@ function updateCoursesByCategory(categoryid) {
 function filterActivities() {
     const searchTerm = document.querySelector('#activity-search')?.value.toLowerCase() || '';
     const selectedCourse = document.querySelector('#course-filter')?.value || '';
-    const selectedCategory = document.querySelector('#category-filter')?.value || '';
+    const categoryFilter = document.querySelector('#category-filter');
+    const selectedCategory = categoryFilter?.getAttribute('data-category-id') || '';
 
     document.querySelectorAll('.course-section').forEach(section => {
         const courseId = section.getAttribute('data-course');
