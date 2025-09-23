@@ -60,6 +60,7 @@ $string['feedbacksaved'] = 'Retroalimentación guardada exitosamente';
 $string['filterplaceholder'] = 'Filtrar por curso, actividad o comentario...';
 $string['frequentWords'] = 'Palabras frecuentes';
 $string['generalsettings'] = 'Configuración general';
+$string['generatecommentai'] = 'Generar análisis de los comentarios con IA';
 $string['getStarted'] = 'Comenzar';
 $string['getStartedDescription'] = 'Una vez que los estudiantes empiecen a valorar actividades y recursos, sus comentarios aparecerán aquí en reportes completos.';
 $string['globalReportSummary'] = 'Resumen global del reporte';

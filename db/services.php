@@ -83,4 +83,12 @@ $functions = [
         'type'        => 'read',
         'ajax'        => true,
     ],
+    'local_datacurso_ratings_get_ai_analysis_comments' => [
+        'classname'   => 'local_datacurso_ratings\external\get_ai_analysis_comments',
+        'methodname'  => 'execute',
+        'classpath'   => '',
+        'description' => 'Devuelve un análisis de la IA de los comentarios de una actividad .',
+        'type'        => 'read',
+        'ajax'        => true,
+    ],
 ];

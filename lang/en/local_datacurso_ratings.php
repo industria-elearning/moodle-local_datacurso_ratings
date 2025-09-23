@@ -60,6 +60,7 @@ $string['feedbacksaved'] = 'Feedback saved successfully';
 $string['filterplaceholder'] = 'Filter by course, activity or comment...';
 $string['frequentWords'] = 'Frequent Words';
 $string['generalsettings'] = 'General Settings';
+$string['generatecommentai'] = 'Generate AI analysis comments';
 $string['getStarted'] = 'Get Started';
 $string['getStartedDescription'] = 'Once students start rating activities and resources, their feedback will appear here in comprehensive reports.';
 $string['globalReportSummary'] = 'Global Report Summary';

@@ -52,21 +52,15 @@
     </div>
 </div>
 
-<!-- Keywords Section -->
-{{#statistics.keywords}}
-{{#.}}
-<div class="mb-3">
-    <h6>{{#str}} frequentWords, local_datacurso_ratings {{/str}}:</h6>
-    <div class="d-flex flex-wrap gap-1">
-        {{#statistics.keywords}}
-        <span class="badge bg-secondary keyword-filter" style="cursor: pointer;" title="{{frequency}} veces">
-            {{word}} ({{frequency}})
-        </span>
-        {{/statistics.keywords}}
-    </div>
+<!-- AI analysis of comments -->
+<div class="mb-3 mt-3">
+    <button  
+        class="btn btn-outline-secondary btn-generate-ai" 
+        data-cmid="{{activity.cmid}}">
+        {{#str}} generatecommentai, local_datacurso_ratings {{/str}} ✨
+    </button>
+    <div class="ai-analysis-result mt-2"></div>
 </div>
-{{/.}}
-{{/statistics.keywords}}
 
 <!-- Search Section -->
 <div class="row mb-3">
