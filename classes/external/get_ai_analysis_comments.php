@@ -16,17 +16,19 @@
 
 namespace local_datacurso_ratings\external;
 
-use core_external\external_api;
-use core_external\external_function_parameters;
-use core_external\external_value;
-use core_external\external_single_structure;
+defined('MOODLE_INTERNAL') || die();
+
+require_once("$CFG->libdir/externallib.php");
+
+use external_function_parameters;
+use external_value;
+use external_single_structure;
+use external_api;
 use context_module;
+use aiprovider_datacurso\httpclient\ai_services_api;
 
 /**
- * Class get_ai_analysis_comments
- *
- * Devuelve un resumen generado por IA (mockeado por ahora) de los comentarios
- * realizados en una actividad.
+ * Web service to get AI analysis for activity comments.
  *
  * @package    local_datacurso_ratings
  * @copyright  2025 Industria Elearning
@@ -35,44 +37,88 @@ use context_module;
 class get_ai_analysis_comments extends external_api {
 
     /**
-     * Parámetros de entrada del WS.
+     * Input parameters.
      *
      * @return external_function_parameters
      */
     public static function execute_parameters() {
         return new external_function_parameters([
-            'cmid' => new external_value(PARAM_INT, 'ID del course module (actividad/recurso)', VALUE_REQUIRED),
+            'cmid' => new external_value(PARAM_INT, 'Course module ID'),
         ]);
     }
 
     /**
-     * Lógica del WS.
+     * Execute main logic.
      *
      * @param int $cmid
      * @return array
      */
     public static function execute($cmid) {
-        global $USER;
+        global $DB;
 
-        // Validar contexto del módulo.
-        $context = context_module::instance($cmid);
+        $params = self::validate_parameters(self::execute_parameters(), [
+            'cmid' => $cmid,
+        ]);
+
+        // Validate context.
+        $cm = get_coursemodule_from_id('', $params['cmid'], 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
         self::validate_context($context);
 
-        // Validar parámetros.
-        $params = self::validate_parameters(self::execute_parameters(), ['cmid' => $cmid]);
+        // Get course.
+        $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 
-        // Aquí iría la lógica de análisis con IA, pero devolvemos un mock.
-        $mockresponse = [
+        // Collect comments.
+        $records = $DB->get_records('local_datacurso_ratings', [
             'cmid' => $params['cmid'],
-            'ai_analysis_comment' => 'La mayoría de los estudiantes valoran positivamente la actividad,'
-                . ' destacando que el contenido fue claro y útil para reforzar el tema.'
-                . ' Sin embargo, algunos mencionan que las instrucciones podrían ser más detalladas.',
+        ], 'timecreated DESC', 'id, feedback, rating');
+
+        $comments = [];
+        $likes = 0;
+
+        foreach ($records as $r) {
+            $islike = ((int)$r->rating === 1);
+            if ($islike) {
+                $likes++;
+            }
+            $comments[] = [
+                'rating' => $islike,
+                'feedback' => $r->feedback,
+            ];
+        }
+
+        $total = count($records);
+        $approvalpercent = $total > 0 ? round(($likes / $total) * 100, 2) : 0.0;
+
+        // Body to send.
+        $body = [
+            'course' => $course->fullname,
+            'activity' => $cm->name,
+            'activity_type' => $cm->modname,
+            'approvalpercent' => $approvalpercent,
+            'comments' => $comments,
         ];
-        return $mockresponse;
+
+        // Call AI API.
+        $client = new ai_services_api();
+        $response = $client->request('POST', '/rating/query', $body);
+
+        // Extract IA reply (assuming API always returns { reply: "...", meta: {...} }).
+        $airesponse = '';
+        if (is_array($response) && isset($response['reply'])) {
+            $airesponse = $response['reply'];
+        } else if (is_string($response)) {
+            $airesponse = $response;
+        }
+
+        return [
+            'cmid' => $params['cmid'],
+            'ai_analysis_comment' => $airesponse,
+        ];
     }
 
     /**
-     * Estructura de retorno del WS.
+     * Return structure.
      *
      * @return external_single_structure
      */
