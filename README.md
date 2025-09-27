@@ -6,7 +6,7 @@ It also integrates **AI-powered analytics**, generating intelligent reports and 
 
 ## Requirements
 
-- **Moodle version**: 4.1+ (specify exact versions supported, e.g., 4.1, 4.2, 4.3, 4.4)
+- **Moodle version**: 4.0+ (specify exact versions supported, e.g., 4.1, 4.2, 4.3, 4.4)
 - **PHP version**: 8.0 or higher
 - **Database**: MySQL 5.7+ or PostgreSQL 10+
 - **Browser compatibility**: Modern browsers (Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)
