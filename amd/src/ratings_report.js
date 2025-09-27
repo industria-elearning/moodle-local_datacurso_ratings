@@ -25,7 +25,6 @@
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
 import Notification from 'core/notification';
-import { get_string as getString } from 'core/str';
 
 /**
  * Initialize the general ratings report
@@ -36,7 +35,6 @@ export const init = () => {
         return;
     }
 
-    // Leer categorías desde el data-attribute
     let categories = [];
     try {
         categories = JSON.parse(container.dataset.categories || '[]');
@@ -245,11 +243,9 @@ function initFilterFeatures() {
 
     if (categoryFilter) {
         categoryFilter.addEventListener('input', () => {
-            // Obtener el ID de la categoría seleccionada
             const selectedName = categoryFilter.value;
             let categoryid = '';
-            
-            // Buscar el ID correspondiente al nombre seleccionado
+
             const datalist = document.querySelector('#categories');
             const options = datalist.querySelectorAll('option');
             
@@ -259,13 +255,11 @@ function initFilterFeatures() {
                 }
             });
             
-            // Guardar el ID en un data attribute
+            // Save ID in data attribute
             categoryFilter.setAttribute('data-category-id', categoryid);
-            
-            // 1. Filtrar actividades
+
             filterActivities();
             
-            // 2. Cargar cursos por categoría seleccionada
             updateCoursesByCategory(categoryid);
         });
     }
@@ -283,7 +277,6 @@ function updateCoursesByCategory(categoryid) {
         return;
     }
 
-    // Limpiar el input y datalist
     courseFilter.value = '';
     coursesDatalist.innerHTML = '<option value="Todos los cursos">Todos los cursos</option>';
 
@@ -322,11 +315,9 @@ function filterActivities() {
         const categoryId = section.getAttribute('data-category');
         let courseVisible = false;
 
-        // Verificar categoría
         const matchesCategory = selectedCategory === '' || categoryId === selectedCategory;
 
         if (matchesCategory && (selectedCourse === '' || courseId === selectedCourse)) {
-            // courseId y selectedCourse son strings con el nombre del curso
 
             section.querySelectorAll('.activity-row').forEach(row => {
                 const activityName = row.getAttribute('data-activity').toLowerCase();

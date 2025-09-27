@@ -32,6 +32,7 @@
 // @module     local_datacurso_ratings/feedback
 // @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
+/* eslint-disable */
 import Ajax from "core/ajax";
 import Notification from "core/notification";
 
@@ -44,7 +45,7 @@ import Notification from "core/notification";
 function addFeedback(feedbacktext) {
     const requests = Ajax.call([{
         methodname: "local_datacurso_ratings_add_feedback",
-        args: {feedbacktext}
+        args: { feedbacktext }
     }]);
 
     return requests[0];
@@ -59,7 +60,7 @@ function addFeedback(feedbacktext) {
 function deleteFeedback(id) {
     const requests = Ajax.call([{
         methodname: "local_datacurso_ratings_delete_feedback",
-        args: {id}
+        args: { id }
     }]);
 
     return requests[0];

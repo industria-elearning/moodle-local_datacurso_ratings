@@ -1,3 +1,26 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * TODO describe module rate
+ *
+ * @module     local_datacurso_ratings/rate
+ * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 /* eslint-disable */
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
@@ -34,31 +57,31 @@ export const init = (cmid) => {
         } 
     };
 
-    // Eventos para rate 👍 y 👎
+    // Events of rate 👍 y 👎
     container.querySelectorAll('[data-action="rate"]').forEach(btn => {
         btn.addEventListener('click', () => {
             const rating = parseInt(btn.dataset.rating, 10);
             
             if (rating === 0) {
-                // Dislike → mostrar opciones de dislike
+                // Dislike → show dislike options
                 show(fbBlock);
                 show(dislikeOptions);
                 hide(likeOptions);
                 sendBtn?.setAttribute('data-rating', '0');
             } else {
-                // Like → mostrar opciones de like
+                // Like → show like options
                 show(fbBlock);
                 show(likeOptions);
                 hide(dislikeOptions);
                 sendBtn?.setAttribute('data-rating', '1');
             }
             
-            // Ocultar textarea al cambiar de rating
+            // Hide textarea to change rating
             hide(fbTextareaWrap);
         });
     });
 
-    // Mostrar textarea específico si selecciona "Otras"
+    // Show textarea especific if "Others"
     container.querySelectorAll('input[name="feedback_choice"]').forEach(radio => {
         radio.addEventListener('change', () => {
             if (radio.value === 'other' && radio.checked) {
@@ -70,29 +93,28 @@ export const init = (cmid) => {
         });
     });
 
-    // Cancelar feedback
+    // Cancelate feedback
     cancelBtn?.addEventListener('click', () => {
         hide(fbBlock);
         hide(fbTextareaWrap);
         
-        // Limpiar todos los campos
+        // Clean all fields
         if (fbInput) fbInput.value = '';
         
-        // Desmarcar todos los radios
+        // Discheck in options
         container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.checked = false);
         
-        // Remover el data-rating del botón send
         sendBtn?.removeAttribute('data-rating');
     });
 
-    // Enviar feedback
+    // Send feedback
     sendBtn?.addEventListener('click', () => {
         const rating = parseInt(sendBtn.getAttribute('data-rating') || '0', 10);
         const selected = container.querySelector('input[name="feedback_choice"]:checked');
 
         let feedback = '';
         
-        // Para ambos casos (like y dislike)
+        // (like y dislike)
         if (selected) {
             if (selected.value === 'other') {
                 feedback = (fbInput?.value || '').trim();
@@ -113,7 +135,7 @@ export const init = (cmid) => {
             const saved = await getString('ratingsaved', 'local_datacurso_ratings');
             Notification.addNotification({message: saved, type: 'success'});
 
-            // Deshabilitar botones después de enviar
+            // Disabled buttons after of send
             if (container) {
                 container.querySelectorAll('[data-action="rate"]').forEach(btn => btn.disabled = true);
                 container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.disabled = true);
@@ -122,7 +144,7 @@ export const init = (cmid) => {
                 if (fbInput) fbInput.disabled = true;
             }
 
-            // Ocultar bloques de feedback
+            // Hide blocks of feedback
             hide(fbBlock);
             hide(fbTextareaWrap);
         })

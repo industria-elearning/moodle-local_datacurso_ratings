@@ -38,22 +38,22 @@ class hook_callbacks {
     public static function before_footer_html_generation(before_footer_html_generation $hook): void {
         global $PAGE, $OUTPUT;
 
-        // No durante instalación inicial.
+        // Not during initial installation.
         if (during_initial_install()) {
             return;
         }
 
-        // Ignorar ciertos layouts (mantenimiento, impresión, redirección, etc.).
+        // Ignore certain layouts (maintenance, print, redirect, etc.).
         if (in_array($PAGE->pagelayout, ['maintenance', 'print', 'redirect', 'embedded'])) {
             return;
         }
 
-        // Validar que estamos en un contexto de módulo.
+        // Validate that we are in a module context.
         if ($PAGE->context->contextlevel != CONTEXT_MODULE) {
             return;
         }
 
-        // Validar que hay un cmid, que el usuario está logueado y que no es invitado.
+        // Validate that there's a cmid, that the user is logged in and is not a guest.
         if (!$PAGE->cm || !isloggedin() || isguestuser()) {
             return;
         }
@@ -65,25 +65,25 @@ class hook_callbacks {
             return; // If disabled, do not inject anything.
         }
 
-        // Exportar datos para el template.
+        // Export data for the template.
         $feedbackpage = new \local_datacurso_ratings\output\feedback_page();
         $feedbackdata = $feedbackpage->export_for_template($OUTPUT);
 
-        // Renderizar el template Mustache con los botones.
+        // Render the Mustache template with the buttons.
         $html = $OUTPUT->render_from_template('local_datacurso_ratings/rate_button', [
             'cmid' => $cm->id,
             'likeItems' => [
-                ['feedbacktext' => 'Muy útil'],
-                ['feedbacktext' => 'Bien explicado'],
-                ['feedbacktext' => 'Interesante'],
+                ['feedbacktext' => 'Very useful'],
+                ['feedbacktext' => 'Well explained'],
+                ['feedbacktext' => 'Interesting'],
             ],
             'dislikeItems' => $feedbackdata['items'],
         ]);
 
-        // Inyectar el HTML antes del footer.
+        // Inject the HTML before the footer.
         $hook->add_html($html);
 
-        // Cargar JS (AMD/ES6) con el cmid.
+        // Load JS (AMD/ES6) with the cmid.
         $PAGE->requires->js_call_amd('local_datacurso_ratings/rate', 'init', [$cm->id]);
     }
 }

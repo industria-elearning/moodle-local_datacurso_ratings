@@ -1,11 +1,11 @@
 /* === Plugin Datacurso Ratings Styles === */
 
-/* Contenedor principal */
+/* Container main */
 .local-dcr-rate {
     margin: 1rem 0;
 }
 
-/* Panel de calificación */
+/* Ratings panel */
 .local-dcr-panel {
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
@@ -14,7 +14,7 @@
     margin-top: 0.5rem;
 }
 
-/* Contenedor de botones Like/Dislike */
+/* Container buttons Like/Dislike */
 .local-dcr-options {
     display: flex;
     gap: 0.5rem;
@@ -22,7 +22,7 @@
     justify-content: flex-start;
 }
 
-/* Área de feedback */
+/* Feedback section */
 .local-dcr-feedback {
     margin-top: 0.5rem;
     padding-top: 0.5rem;
@@ -46,7 +46,7 @@
     box-shadow: 0 0 0 0.2rem rgba(15, 108, 191, 0.25);
 }
 
-/* Animaciones de entrada */
+/* Animations */
 .local-dcr-panel[aria-hidden="false"] {
     animation: slideDown 0.3s ease-out;
 }

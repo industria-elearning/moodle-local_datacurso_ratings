@@ -34,7 +34,7 @@ $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('ratingsreport', 'local_datacurso_ratings'));
 $PAGE->set_heading(get_string('ratingsreport', 'local_datacurso_ratings'));
 
-// Obtenemos las categorías.
+// Get categories.
 $categorieslist = core_course_category::make_categories_list();
 $categories = [];
 foreach ($categorieslist as $id => $name) {
@@ -45,7 +45,6 @@ foreach ($categorieslist as $id => $name) {
     ];
 }
 
-// Renderizamos el template.
 echo $OUTPUT->header();
 
 echo '<div id="general-ratings-report-container"

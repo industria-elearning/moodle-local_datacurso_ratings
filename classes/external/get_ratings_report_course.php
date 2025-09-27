@@ -30,7 +30,7 @@ use core\context;
 use moodle_exception;
 
 /**
- * Servicio externo para obtener el reporte de valoraciones a nivel de curso.
+ * External service to get course-level ratings report.
  *
  * @package    local_datacurso_ratings
  * @category   external
@@ -40,20 +40,20 @@ use moodle_exception;
 class get_ratings_report_course extends external_api {
 
     /**
-     * Parámetros de entrada de la función.
+     * Function input parameters.
      *
      * @return external_function_parameters
      */
     public static function execute_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'ID del curso'),
+            'courseid' => new external_value(PARAM_INT, 'Course ID'),
         ]);
     }
 
     /**
-     * Lógica principal: consulta y devuelve la información.
+     * Main logic: queries and returns the information.
      *
-     * @param int $courseid ID del curso
+     * @param int $courseid Course ID
      * @return array
      */
     public static function execute($courseid) {
@@ -66,7 +66,7 @@ class get_ratings_report_course extends external_api {
         $context = context_course::instance($params['courseid']);
         self::validate_context($context);
 
-        // Inicializar modinfo del curso.
+        // Initialize course modinfo.
         $modinfo = get_fast_modinfo($params['courseid']);
         $cms = $modinfo->get_cms();
 
@@ -74,10 +74,10 @@ class get_ratings_report_course extends external_api {
 
         foreach ($cms as $cm) {
             if (!$cm->uservisible) {
-                continue; // Saltar si el usuario no puede ver el módulo.
+                continue; // Skip if the user cannot see the module.
             }
 
-            // Traer las valoraciones de esta actividad.
+            // Get ratings for this activity.
             $sql = "
                 SELECT
                     SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
@@ -93,7 +93,7 @@ class get_ratings_report_course extends external_api {
 
             $record = $DB->get_record_sql($sql, ['cmid' => $cm->id]);
 
-            // Si no hay votos aún, inicializamos en 0.
+            // If there are no votes yet, initialize to 0.
             $likes = (int)($record->likes ?? 0);
             $dislikes = (int)($record->dislikes ?? 0);
             $porcentaje = (float)($record->porcentaje_aprobacion ?? 0);
@@ -115,21 +115,21 @@ class get_ratings_report_course extends external_api {
     }
 
     /**
-     * Estructura de salida.
+     * Output structure.
      *
      * @return external_multiple_structure
      */
     public static function execute_returns() {
         return new external_multiple_structure(
             new external_single_structure([
-                'curso' => new external_value(PARAM_TEXT, 'Nombre del curso'),
-                'actividad' => new external_value(PARAM_TEXT, 'Nombre de la actividad'),
-                'modulo' => new external_value(PARAM_TEXT, 'Tipo de módulo'),
+                'curso' => new external_value(PARAM_TEXT, 'Course name'),
+                'actividad' => new external_value(PARAM_TEXT, 'Activity name'),
+                'modulo' => new external_value(PARAM_TEXT, 'Module type'),
                 'cmid' => new external_value(PARAM_INT, 'Course module ID'),
-                'likes' => new external_value(PARAM_INT, 'Número de me gusta'),
-                'dislikes' => new external_value(PARAM_INT, 'Número de no me gusta'),
-                'porcentaje' => new external_value(PARAM_FLOAT, '% de aprobación'),
-                'comentarios' => new external_value(PARAM_RAW, 'Comentarios concatenados'),
+                'likes' => new external_value(PARAM_INT, 'Number of likes'),
+                'dislikes' => new external_value(PARAM_INT, 'Number of dislikes'),
+                'porcentaje' => new external_value(PARAM_FLOAT, 'Approval percentage'),
+                'comentarios' => new external_value(PARAM_RAW, 'Concatenated comments'),
             ])
         );
     }

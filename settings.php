@@ -26,13 +26,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    // Crear categoría propia para el plugin en la administración.
     $ADMIN->add('localplugins', new admin_category(
         'local_datacurso_ratings_category',
         get_string('pluginname', 'local_datacurso_ratings')
     ));
 
-    // Añadir un enlace hacia feedback.php.
+    // Link feedback page.
     $ADMIN->add('local_datacurso_ratings_category', new admin_externalpage(
         'local_datacurso_ratings_feedback',
         get_string('managefeedback', 'local_datacurso_ratings'),
@@ -40,7 +39,7 @@ if ($hassiteconfig) {
         'moodle/site:config' // Capacidad requerida.
     ));
 
-    // Enlace para ver el reporte administrativo de calificaciones.
+    // Link report general ratings.
     $ADMIN->add('local_datacurso_ratings_category', new admin_externalpage(
         'local_datacurso_ratings_report',
         get_string('ratingsreport', 'local_datacurso_ratings'),

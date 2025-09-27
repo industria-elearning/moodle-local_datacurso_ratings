@@ -28,7 +28,7 @@ use external_api;
 use context_system;
 
 /**
- * Web service para obtener cursos por categoría.
+ * Web service to get courses by category.
  *
  * @package    local_datacurso_ratings
  * @copyright  2025 Industria Elearning
@@ -37,7 +37,7 @@ use context_system;
 class get_courses_by_category extends external_api {
 
     /**
-     * Parámetros de entrada de la función.
+     * Function input parameters.
      *
      * @return external_function_parameters
      */
@@ -48,7 +48,7 @@ class get_courses_by_category extends external_api {
     }
 
     /**
-     * Lógica principal: obtiene cursos de una categoría específica.
+     * Main logic: gets courses from a specific category.
      *
      * @param int $categoryid
      * @return array
@@ -60,28 +60,28 @@ class get_courses_by_category extends external_api {
             'categoryid' => $categoryid,
         ]);
 
-        // Validar contexto de sistema.
+        // Validate system context.
         $context = context_system::instance();
         self::validate_context($context);
 
-        // Verificar que la categoría existe.
+        // Verify that the category exists.
         $category = $DB->get_record('course_categories', ['id' => $params['categoryid']], '*', MUST_EXIST);
 
-        // Obtener cursos de la categoría.
+        // Get courses from the category.
         $courses = $DB->get_records('course', [
             'category' => $params['categoryid'],
-            'visible' => 1, // Solo cursos visibles.
+            'visible' => 1, // Only visible courses.
         ], 'fullname ASC', 'id, fullname, shortname, category');
 
-        // Procesar resultados.
+        // Process results.
         $result = [];
         foreach ($courses as $course) {
-            // Saltar el curso sitio (ID = 1).
+            // Skip the site course (ID = 1).
             if ($course->id == SITEID) {
                 continue;
             }
 
-            // Verificar si el usuario tiene acceso al curso.
+            // Check if the user has access to the course.
             $coursecontext = \context_course::instance($course->id);
             if (
                 has_capability('moodle/course:view', $coursecontext) ||
@@ -100,7 +100,7 @@ class get_courses_by_category extends external_api {
     }
 
     /**
-     * Estructura de salida.
+     * Output structure.
      *
      * @return external_multiple_structure
      */

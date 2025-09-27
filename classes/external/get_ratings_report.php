@@ -28,7 +28,7 @@ use external_api;
 use context_system;
 
 /**
- * Webservice para traer el reporte general de actividades con ratings.
+ * Web service to get general report of activities with ratings.
  *
  * @package    local_datacurso_ratings
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
@@ -37,7 +37,7 @@ use context_system;
 class get_ratings_report extends external_api {
 
     /**
-     * Parámetros de entrada de la función.
+     * Function input parameters.
      *
      * @return external_function_parameters
      */
@@ -46,7 +46,7 @@ class get_ratings_report extends external_api {
     }
 
     /**
-     * Lógica principal: consulta y devuelve la información.
+     * Main logic: queries and returns the information.
      *
      * @return array
      */
@@ -55,11 +55,11 @@ class get_ratings_report extends external_api {
 
         $params = self::validate_parameters(self::execute_parameters(), []);
 
-        // Validar contexto de sistema (porque es reporte global).
+        // Validate system context (because it's a global report).
         $context = context_system::instance();
         self::validate_context($context);
 
-        // 1. Traer los ratings agrupados por cmid.
+        // 1. Get ratings grouped by cmid.
         $sql = "
             SELECT r.cmid,
                    cm.course,
@@ -76,8 +76,8 @@ class get_ratings_report extends external_api {
 
         $result = [];
 
-        // 2. Agrupar por curso usando get_fast_modinfo.
-        $coursecache = []; // Cache local para no recalcular modinfo varias veces.
+        // 2. Group by course using get_fast_modinfo.
+        $coursecache = []; // Local cache to avoid recalculating modinfo multiple times.
 
         foreach ($records as $r) {
             $courseid = $r->course;
@@ -87,14 +87,14 @@ class get_ratings_report extends external_api {
             }
             $modinfo = $coursecache[$courseid];
 
-            // Obtener info del módulo.
+            // Get module info.
             if (!$modinfo->cms || !isset($modinfo->cms[$r->cmid])) {
-                continue; // Si no existe el cmid, saltar.
+                continue; // If cmid doesn't exist, skip.
             }
 
             $cm = $modinfo->get_cm($r->cmid);
             if (!$cm->uservisible) {
-                continue; // Saltar si el usuario no tiene permiso de verlo.
+                continue; // Skip if user doesn't have permission to see it.
             }
 
             $commentsarray = [];
@@ -120,25 +120,25 @@ class get_ratings_report extends external_api {
     }
 
     /**
-     * Estructura de salida.
+     * Output structure.
      *
      * @return external_multiple_structure
      */
     public static function execute_returns() {
         return new external_multiple_structure(
             new external_single_structure([
-                'course' => new external_value(PARAM_TEXT, 'Nombre del curso'),
-                'categoryid' => new external_value(PARAM_INT, 'ID de la categoría del curso'),
-                'activity' => new external_value(PARAM_TEXT, 'Nombre de la actividad'),
-                'modname' => new external_value(PARAM_TEXT, 'Tipo de módulo'),
+                'course' => new external_value(PARAM_TEXT, 'Course name'),
+                'categoryid' => new external_value(PARAM_INT, 'Course category ID'),
+                'activity' => new external_value(PARAM_TEXT, 'Activity name'),
+                'modname' => new external_value(PARAM_TEXT, 'Module type'),
                 'cmid' => new external_value(PARAM_INT, 'Course module ID'),
-                'url' => new external_value(PARAM_URL, 'URL de la actividad', VALUE_OPTIONAL),
-                'likes' => new external_value(PARAM_INT, 'Número de me gusta'),
-                'dislikes' => new external_value(PARAM_INT, 'Número de no me gusta'),
-                'approvalpercent' => new external_value(PARAM_FLOAT, '% de aprobación'),
+                'url' => new external_value(PARAM_URL, 'Activity URL', VALUE_OPTIONAL),
+                'likes' => new external_value(PARAM_INT, 'Number of likes'),
+                'dislikes' => new external_value(PARAM_INT, 'Number of dislikes'),
+                'approvalpercent' => new external_value(PARAM_FLOAT, 'Approval percentage'),
                 'comments' => new external_multiple_structure(
-                    new external_value(PARAM_RAW, 'Comentario individual'),
-                    'Lista de comentarios',
+                    new external_value(PARAM_RAW, 'Individual comment'),
+                    'List of comments',
                     VALUE_OPTIONAL
                 ),
             ])

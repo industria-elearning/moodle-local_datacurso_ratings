@@ -30,9 +30,9 @@
  * @param context_course $context The course context.
  */
 function local_datacurso_ratings_extend_navigation_course($navigation, $course, $context) {
-    // Solo profesores y managers pueden ver el reporte.
+    // Teachers and managers can see the report.
     if (has_capability('local/datacurso_ratings:viewreports', $context)) {
-        // Buscar específicamente el nodo de "Informes".
+        // Search especific the nodo of "Reports".
         $reportsnode = $navigation->get('coursereports');
         if ($reportsnode) {
             $url = new moodle_url(

@@ -24,10 +24,8 @@
 /* eslint-disable */
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
-import Notification from 'core/notification';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
-import {get_string as getString} from 'core/str';
 
 /**
  * Initialize comments modal functionality

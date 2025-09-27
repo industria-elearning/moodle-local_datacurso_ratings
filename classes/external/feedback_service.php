@@ -25,7 +25,7 @@ use context_system;
 /**
  * Class feedback_service
  *
- * Servicios externos para gestionar feedback en el plugin.
+ * External services for managing feedback in the plugin.
  *
  * @package    local_datacurso_ratings
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
@@ -34,23 +34,23 @@ use context_system;
 class feedback_service extends external_api {
 
     /**
-     * Define los parámetros de entrada para add_feedback.
+     * Define input parameters for add_feedback.
      *
      * @return external_function_parameters
      */
     public static function add_feedback_parameters() {
         return new external_function_parameters([
-            'feedbacktext' => new external_value(PARAM_TEXT, 'Texto del feedback', VALUE_REQUIRED),
+            'feedbacktext' => new external_value(PARAM_TEXT, 'Feedback text', VALUE_REQUIRED),
         ]);
     }
 
     /**
-     * Agregar un feedback.
+     * Add a feedback.
      *
-     * @param string $feedbacktext Texto del feedback
-     * @return array Array con:
-     *  - int id: ID del feedback creado
-     *  - string message: Mensaje de confirmación
+     * @param string $feedbacktext Feedback text
+     * @return array Array with:
+     *  - int id: ID of the created feedback
+     *  - string message: Confirmation message
      */
     public static function add_feedback($feedbacktext) {
         global $DB;
@@ -69,34 +69,34 @@ class feedback_service extends external_api {
     }
 
     /**
-     * Define la estructura de retorno para add_feedback.
+     * Define return structure for add_feedback.
      *
      * @return external_single_structure
      */
     public static function add_feedback_returns() {
         return new external_single_structure([
-            'id' => new external_value(PARAM_INT, 'ID del feedback creado'),
-            'message' => new external_value(PARAM_TEXT, 'Mensaje de confirmación'),
+            'id' => new external_value(PARAM_INT, 'ID of the created feedback'),
+            'message' => new external_value(PARAM_TEXT, 'Confirmation message'),
         ]);
     }
 
     /**
-     * Define los parámetros de entrada para delete_feedback.
+     * Define input parameters for delete_feedback.
      *
      * @return external_function_parameters
      */
     public static function delete_feedback_parameters() {
         return new external_function_parameters([
-            'id' => new external_value(PARAM_INT, 'ID del feedback a eliminar', VALUE_REQUIRED),
+            'id' => new external_value(PARAM_INT, 'ID of the feedback to delete', VALUE_REQUIRED),
         ]);
     }
 
     /**
-     * Eliminar un feedback.
+     * Delete a feedback.
      *
-     * @param int $id ID del feedback a eliminar
-     * @return array Array con:
-     *  - string message: Mensaje de confirmación
+     * @param int $id ID of the feedback to delete
+     * @return array Array with:
+     *  - string message: Confirmation message
      */
     public static function delete_feedback($id) {
         global $DB;
@@ -110,13 +110,13 @@ class feedback_service extends external_api {
     }
 
     /**
-     * Define la estructura de retorno para delete_feedback.
+     * Define return structure for delete_feedback.
      *
      * @return external_single_structure
      */
     public static function delete_feedback_returns() {
         return new external_single_structure([
-            'message' => new external_value(PARAM_TEXT, 'Mensaje de confirmación'),
+            'message' => new external_value(PARAM_TEXT, 'Confirmation message'),
         ]);
     }
 }
