@@ -28,7 +28,6 @@ A comprehensive Moodle local plugin that enables students to rate course activit
 
 ### AI-Powered Analytics 
 - **Sentiment Analysis**: Automated analysis of comment sentiment (positive/negative/neutral)
-- **Comment Categorization**: AI-driven classification of feedback into themes
 - **Recommendation Engine**: AI-generated suggestions for content improvement
 
 ## Technical Architecture
@@ -125,12 +124,14 @@ A comprehensive Moodle local plugin that enables students to rate course activit
 - Satisfaction percentages and trends
 - Comment summaries and detailed feedback
 - Visual indicators for content performance
+- AI analysis comments of activtie/resource a course level
 
 ### Global Reports
 - Institution-wide rating statistics
 - Course category comparisons
 - Most/least satisfied activities identification
 - Advanced filtering and search capabilities
+- AI analysis comments of activtie/resource global activitie/resource
 
 ### Interactive Comments Analysis
 - Paginated comment viewing (handles 100+ comments efficiently)
