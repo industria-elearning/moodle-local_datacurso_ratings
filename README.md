@@ -1,155 +1,268 @@
-# Datacurso Ratings Plugin for Moodle
+# Datacurso Ratings for Moodle
 
-A comprehensive Moodle local plugin that enables students to rate course activities and resources with a simple Like/Dislike system, providing valuable feedback for educational institutions to improve content quality and student satisfaction.
+The **Datacurso Ratings** plugin allows students to rate course activities and resources in Moodle using a simple 👍 Like / 👎 Dislike system, providing valuable feedback to improve content quality and student satisfaction.  
 
-## Overview
+It also integrates **AI-powered analytics**, generating intelligent reports and recommendations for teachers and administrators.
 
-**Datacurso Ratings** allows students to evaluate activities and resources within Moodle courses using a thumbs-up/thumbs-down rating system. When students provide negative feedback, they can select from predefined reasons or provide custom comments. The plugin generates detailed reports and analytics to help educators and administrators understand student engagement and content effectiveness.
+## Requirements
+
+- **Moodle version**: 4.1+ (specify exact versions supported, e.g., 4.1, 4.2, 4.3, 4.4)
+- **PHP version**: 8.0 or higher
+- **Database**: MySQL 5.7+ or PostgreSQL 10+
+- **Browser compatibility**: Modern browsers (Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)
 
 ## Key Features
 
 ### Student Rating System
-- **Simple Rating Interface**: Students can rate activities with 👍 (Like) or 👎 (Dislike) buttons
-- **Contextual Feedback**: Negative ratings trigger predefined feedback options or custom comments
-- **One Rating Per User**: Unique constraint ensures each student can rate an activity only once
-- **Seamless Integration**: Rating buttons appear automatically on all activity pages
+- Intuitive interface with 👍 / 👎 buttons on all activities and resources
+- Contextual feedback: negative ratings allow selecting predefined reasons or writing custom comments
+- One rating per user per activity restriction
+- Seamless integration into Moodle with no additional setup required
+- AJAX-based rating system for immediate feedback
 
 ### Administrative Management
-- **Predefined Feedback Management**: Administrators can create and manage standard feedback responses
-- **Global Plugin Settings**: Enable/disable the plugin system-wide
-- **Permission Controls**: Fine-grained access control through Moodle capabilities
+- Manage predefined feedback reasons through admin interface
+- Global plugin configuration (enable/disable functionality)
+- Permission control using Moodle capabilities system
+- Bulk operations for feedback management
 
-### Comprehensive Reporting System
-- **Course-Level Reports**: Detailed statistics for individual courses showing activity performance
-- **Global Reports**: Institution-wide overview of all rated activities across courses
-- **Advanced Filtering**: Filter by course categories, specific courses, or search activities
-- **Interactive Comments Modal**: View detailed feedback with pagination, search, and statistics
-- **Export Capabilities**: Export data for further analysis
+### Reports and Analytics
+- **Course-level reports**: Detailed statistics for activities and resources within a course
+- **Global reports**: Institution-wide analytics with advanced filtering options
+- **Interactive comment explorer**: Modal interface with pagination, search, and sorting
+- **Data export**: CSV/Excel export functionality for external analysis
+- **Real-time statistics**: Live updates of rating metrics
 
-### AI-Powered Analytics 
-- **Sentiment Analysis**: Automated analysis of comment sentiment (positive/negative/neutral)
-- **Recommendation Engine**: AI-generated suggestions for content improvement
-
-## Technical Architecture
-
-### Core Components
-- **Hook Implementation**: `\core\hook\output\before_footer_html_generation` via `/db/hooks.php`
-- **UI Templates**: Mustache templates in `templates/` directory
-- **JavaScript**: Modern ES6 AMD modules in `amd/src/` (no jQuery dependency)
-- **Web Services**: RESTful API endpoints defined in `db/services.php`
-- **Database Schema**: Optimized table structure with proper indexing
-
-### Database Structure
-**Main Table**: `local_datacurso_ratings`
-```sql
-- cmid (INT) - Course module ID
-- userid (INT) - User ID who rated
-- rating (TINYINT) - 1 for like, 0 for dislike
-- feedback (TEXT) - Optional comment text
-- timecreated (BIGINT) - Creation timestamp
-- timemodified (BIGINT) - Modification timestamp
-- UNIQUE INDEX (cmid, userid) - Prevents duplicate ratings
-```
-
-**Feedback Options Table**: `local_datacurso_ratings_feedback`
-```sql
-- id (INT) - Primary key
-- feedback_text (TEXT) - Predefined feedback option
-- is_active (TINYINT) - Active status
-- sort_order (INT) - Display order
-- timecreated (BIGINT) - Creation timestamp
-- timemodified (BIGINT) - Modification timestamp
-```
-
-### Web Services API
-
-#### Core Rating Services
-- `local_datacurso_ratings_save_rating` - Save student ratings and feedback
-- `local_datacurso_ratings_get_ratings_report_course` - Get course-specific rating data
-- `local_datacurso_ratings_get_ratings_report` - Get global rating statistics
-- `local_datacurso_ratings_get_activity_comments` - Retrieve detailed comments with pagination
-- `local_datacurso_ratings_get_courses_by_category` - Filter courses by category
-
-#### Administrative Services
-- `local_datacurso_ratings_add_feedback` - Add predefined feedback options
-- `local_datacurso_ratings_delete_feedback` - Remove feedback options
-
-### Capabilities and Permissions
-- `local/datacurso_ratings:rate` - Rate activities (Students, Teachers, Managers)
-- `local/datacurso_ratings:viewreports` - View rating reports (Teachers, Managers)
-- `local/datacurso_ratings:manage` - Manage plugin settings (Managers only)
+### AI-Powered Analytics
+- **Sentiment analysis** of student comments (positive, negative, neutral)
+- **Smart recommendations** with AI-generated suggestions for content improvement
+- **Trend analysis** using machine learning algorithms
+- Compatible with Moodle's AI subsystem
 
 ## Installation
 
-1. **Download and Extract**: Unzip the plugin into `local/datacurso_ratings` within your Moodle root directory
+### Method 1: Manual Installation
 
-2. **Install Plugin**: Navigate to *Site Administration → Notifications* to trigger installation and database setup
+1. **Download** the plugin files
+2. **Extract** to your Moodle directory:
+   ```
+   {moodleroot}/local/datacurso_ratings/
+   ```
+3. **Login** as administrator
+4. **Navigate** to Site administration → Notifications
+5. **Complete** the installation process by following the prompts
 
-3. **Verify Permissions**: Ensure appropriate roles have the required capabilities:
+### Method 2: Command Line Installation
+
+```bash
+cd /path/to/moodle
+php admin/cli/upgrade.php
+```
+
+### Post-Installation Setup
+
+1. **Configure capabilities**:
    - Students: `local/datacurso_ratings:rate`
    - Teachers: `local/datacurso_ratings:rate`, `local/datacurso_ratings:viewreports`
    - Managers: All capabilities
 
-4. **Configure Settings**: Go to *Site Administration → Plugins → Local plugins → Datacurso Ratings* to configure global settings
+2. **Global settings**:
+   - Navigate to Site administration → Plugins → Local plugins → Datacurso Ratings
+   - Configure default settings as needed
 
-5. **Test Functionality**: Visit any activity page as a user with rating permission to see the rating interface
+3. **Verify installation**:
+   - Check that rating buttons appear on course activities
+   - Test the rating functionality with a test student account
+
+## Configuration
+
+### Global Settings
+
+Access global configuration through:
+**Site administration → Plugins → Local plugins → Datacurso Ratings**
+
+Available settings:
+- **Enable/Disable plugin globally**
+- **Default feedback reasons** (can be customized)
+- **AI analytics settings** (if AI subsystem is available)
+- **Report permissions** and visibility settings
+
+### Permissions and Capabilities
+
+| Capability | Description | Default Roles |
+|------------|-------------|---------------|
+| `local/datacurso_ratings:rate` | Rate activities and resources | Student, Teacher, Manager |
+| `local/datacurso_ratings:viewreports` | View rating reports | Teacher, Manager |
+| `local/datacurso_ratings:manage` | Manage plugin settings | Manager |
 
 ## Usage
 
 ### For Students
-1. Navigate to any course activity or resource
-2. Scroll to find the "Rate this activity" button
-3. Click 👍 for positive feedback (saves immediately)
-4. Click 👎 for negative feedback and optionally provide comments
-5. Submit feedback to help improve course content
+1. **Navigate** to any course activity or resource
+2. **Click** the 👍 (Like) or 👎 (Dislike) button
+3. **For dislikes**: Optionally select a reason or provide custom feedback
+4. **Submit**: Your rating is saved automatically
 
 ### For Teachers
-1. Access course reports via the course navigation menu under "Reports"
-2. View "Activity/Resource Ratings Report" for detailed course statistics
-3. Analyze student satisfaction metrics and feedback
-4. Click "View Comments" to see detailed student feedback in a modal window
-5. Click "Generate analysis with AI" to generate analysis of comments of activitie/resource
+1. **Access reports** through course navigation menu
+2. **View statistics** for all course activities
+3. **Analyze feedback** and comments from students
+4. **Generate AI insights** for content improvement recommendations
+5. **Export data** for further analysis
 
 ### For Administrators
-1. Manage predefined feedback options in plugin settings
-2. Access global reports showing institution-wide rating statistics
-3. Use advanced filters to analyze data by category, course, or activity
-4. Export data for external analysis and reporting
-5. Click "Generate analysis with AI" to generate analysis of comments of activitie/resource
+1. **Manage feedback reasons** in plugin settings
+2. **Access global reports** across all courses
+3. **Filter data** by categories, courses, or time periods
+4. **Monitor plugin usage** and performance metrics
 
-## Report Features
+## Database Schema
 
-### Course-Level Reports
-- Activity-by-activity breakdown of ratings
-- Satisfaction percentages and trends
-- Comment summaries and detailed feedback
-- Visual indicators for content performance
-- AI analysis comments of activtie/resource a course level
+### Main Tables
+
+#### `local_datacurso_ratings`
+Stores individual ratings from users.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | BIGINT | Primary key |
+| `cmid` | BIGINT | Course module ID (foreign key) |
+| `userid` | BIGINT | User ID who rated (foreign key) |
+| `rating` | TINYINT | 1 = Like, 0 = Dislike |
+| `feedback` | TEXT | Optional comment/feedback |
+| `timecreated` | BIGINT | Unix timestamp of creation |
+| `timemodified` | BIGINT | Unix timestamp of last modification |
+
+**Indexes:**
+- Unique constraint on (`cmid`, `userid`)
+- Index on `timecreated` for performance
+- Index on `rating` for quick statistics
+
+#### `local_datacurso_ratings_feedback`
+Stores predefined feedback options for negative ratings.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | BIGINT | Primary key |
+| `feedback_text` | TEXT | Predefined feedback option |
+| `is_active` | TINYINT | Active status (1 = active, 0 = inactive) |
+| `sort_order` | INT | Display order |
+| `timecreated` | BIGINT | Unix timestamp of creation |
+| `timemodified` | BIGINT | Unix timestamp of last modification |
+
+## Web Services API
+
+The plugin provides REST web services for external integrations:
+
+### Available Services
+
+| Service | Description | Parameters |
+|---------|-------------|------------|
+| `local_datacurso_ratings_save_rating` | Save a rating for an activity | `cmid`, `rating`, `feedback` |
+| `local_datacurso_ratings_get_ratings_report_course` | Get course-level report | `courseid`, `filters` |
+| `local_datacurso_ratings_get_ratings_report` | Get global report | `filters`, `pagination` |
+| `local_datacurso_ratings_get_activity_comments` | Get comments with pagination | `cmid`, `page`, `limit` |
+| `local_datacurso_ratings_get_courses_by_category` | Filter courses by category | `categoryid` |
+
+### API Authentication
+All web services require proper Moodle authentication and appropriate capabilities.
+
+## Technical Architecture
+
+### Frontend
+- **JavaScript ES6** modules in `amd/src/`
+- **No jQuery dependencies** (uses native DOM API)
+- **Mustache templates** for UI rendering
+- **AJAX** for seamless user experience
+
+### Backend
+- **Hook integration**: `\core\hook\output\before_footer_html_generation`
+- **REST web services** defined in `db/services.php`
+- **Database layer** with optimized queries and indexes
+- **Caching** for improved performance
+
+### AI Integration
+- Compatible with Moodle's AI subsystem (Moodle 4.4+)
+- Pluggable AI providers for sentiment analysis
+- Machine learning recommendations
+
+## Reports and Analytics
+
+### Course Reports
+- **Activity statistics**: Like/dislike ratios per activity
+- **Trend analysis**: Rating patterns over time
+- **Comment analysis**: Detailed feedback review
+- **AI insights**: Automated recommendations
 
 ### Global Reports
-- Institution-wide rating statistics
-- Course category comparisons
-- Most/least satisfied activities identification
-- Advanced filtering and search capabilities
-- AI analysis comments of activtie/resource global activitie/resource
+- **Institution-wide metrics**: Cross-course comparisons
+- **Category analysis**: Performance by course categories
+- **User engagement**: Student participation statistics
+- **Export capabilities**: Data download in multiple formats
 
-### Interactive Comments Analysis
-- Paginated comment viewing (handles 100+ comments efficiently)
-- Search and filter comments by text
-- Keyword frequency analysis
-- Statistical summaries (like/dislike ratios, comment counts)
+## Troubleshooting
+
+### Common Issues
+
+**Rating buttons not appearing:**
+- Verify plugin is enabled globally
+- Check user has `local/datacurso_ratings:rate` capability
+- Clear caches (Site administration → Development → Purge caches)
+
+**Reports not loading:**
+- Verify user has `local/datacurso_ratings:viewreports` capability
+- Check JavaScript console for errors
+- Verify web services are enabled
+
+**AI features not working:**
+- Ensure Moodle 4.4+ with AI subsystem
+- Verify AI provider configuration
+- Check AI-related capabilities
+
+### Debug Mode
+Enable debugging to get detailed error information:
+Site administration → Development → Debugging → Developer level
+
+## Privacy and GDPR Compliance
+
+This plugin stores:
+- **User ratings** (linked to user IDs)
+- **Feedback comments** (potentially containing personal opinions)
+- **Usage timestamps**
+
+**Data retention**: Ratings are kept according to Moodle's data retention policies.
+**Data export**: User data can be exported through Moodle's privacy API.
+**Data deletion**: User ratings are automatically deleted when users are removed from the system.
 
 ## Multilingual Support
 
-The plugin includes comprehensive language packs:
+### Included Languages
 - **English** (`lang/en/`)
 - **Spanish** (`lang/es/`)
-- Additional languages can be easily added through standard Moodle localization
+
+### Adding New Languages
+Use Moodle's standard localization system to add translations:
+1. Create language directory: `lang/{languagecode}/`
+2. Add translation file: `local_datacurso_ratings.php`
+3. Follow Moodle string naming conventions
+
+## Version History
+
+### Version 1.0.0
+- Initial release
+- Basic rating functionality
+- Course and global reports
+- AI-powered analytics
+
+## Support and Contributing
+
+- **Author**: Developer <developer@datacurso.com>
+- **Issues**: Report bugs and feature requests through the Moodle plugins directory
+- **Contributing**: Pull requests welcome following Moodle coding standards
+- **Documentation**: [Moodle AI API Documentation](https://moodledev.io/docs/apis/ai)
 
 ## License
 
-This plugin is licensed under the GNU General Public License v3.0, maintaining compatibility with Moodle's licensing requirements.
+This program is free software: you can redistribute it and/or modify it under the terms of the **GNU General Public License** as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
----
-
-**Datacurso Ratings** transforms student feedback collection in Moodle, providing educators with actionable insights to continuously improve educational content quality and student satisfaction.
+This program is distributed in the hope that it will be useful, but **WITHOUT ANY WARRANTY**; without even the implied warranty of **MERCHANTABILITY** or **FITNESS FOR A PARTICULAR PURPOSE**. See the [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.html) for more details.
