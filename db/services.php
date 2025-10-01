@@ -91,4 +91,20 @@ $functions = [
         'type'        => 'read',
         'ajax'        => true,
     ],
+    'local_datacurso_ratings_get_ai_analysis_course' => [
+        'classname'   => 'local_datacurso_ratings\external\get_ai_analysis_course',
+        'methodname'  => 'execute',
+        'classpath'   => '',
+        'description' => 'Devuelve un análisis general de la IA para un curso completo.',
+        'type'        => 'read',
+        'ajax'        => true,
+    ],
+    'local_datacurso_ratings_get_ai_analysis_global' => [
+        'classname'   => 'local_datacurso_ratings\external\get_ai_analysis_global',
+        'methodname'  => 'execute',
+        'classpath'   => '',
+        'description' => 'Devuelve un análisis global de la IA de todas las actividades de un curso.',
+        'type'        => 'read',
+        'ajax'        => true,
+    ],
 ];

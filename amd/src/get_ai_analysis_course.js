@@ -14,9 +14,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module get_ai_analysis_comments
+ * TODO describe module get_ai_analysis_course
  *
- * @module     local_datacurso_ratings/get_ai_analysis_comments
+ * @module     local_datacurso_ratings/get_ai_analysis_course
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,34 +25,33 @@
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
-export const init = () => {
+export const init = (courseid) => {
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-generate-ai-activitie') || e.target.closest('.btn-generate-ai-activitie')) {
+        if (e.target.classList.contains('btn-generate-ai-course') || e.target.closest('.btn-generate-ai-course')) {
             e.preventDefault();
 
-            const button = e.target.closest('.btn-generate-ai-activitie');
-            const cmid = button.getAttribute('data-cmid');
-            // Ahora buscamos dentro del padre más cercano (el div .mb-3)
-            const container = button.closest('.mb-3');
-            const resultContainer = container.querySelector('.ai-analysis-result');
+            console.log(courseid)
 
-            if (!cmid || !resultContainer) {
-                console.warn('No se encontró cmid o contenedor para resultado');
+            const button = e.target.closest('.btn-generate-ai-course');
+            const resultContainer = document.querySelector('.ai-analysis-result-course');
+
+            if (!courseid || !resultContainer) {
+                console.warn('No se encontró courseid o contenedor para resultado');
                 return;
             }
 
             resultContainer.innerHTML = `<div class="text-muted">
-                <i class="fa fa-spinner fa-spin"></i> Generando análisis...
+                <i class="fa fa-spinner fa-spin"></i> Generando análisis del curso...
             </div>`;
 
             Ajax.call([{
-                methodname: 'local_datacurso_ratings_get_ai_analysis_comments',
-                args: { cmid: parseInt(cmid, 10) }
+                methodname: 'local_datacurso_ratings_get_ai_analysis_course',
+                args: { courseid: parseInt(courseid, 10) }
             }])[0]
             .then(data => {
                 resultContainer.innerHTML = `
                     <div class="alert alert-info p-2 mb-2">
-                        ${data.ai_analysis_comment}
+                        ${data.ai_analysis_course}
                     </div>`;
             })
             .catch(Notification.exception);

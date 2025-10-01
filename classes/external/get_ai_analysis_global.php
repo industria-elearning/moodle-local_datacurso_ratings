@@ -1,0 +1,113 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace local_datacurso_ratings\external;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once("$CFG->libdir/externallib.php");
+
+use external_function_parameters;
+use external_single_structure;
+use external_value;
+use external_api;
+use context_system;
+use aiprovider_datacurso\httpclient\ai_services_api;
+
+/**
+ * Class get_ai_analysis_global
+ *
+ * @package    local_datacurso_ratings
+ * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class get_ai_analysis_global extends external_api {
+
+    /**
+     * No params required.
+     */
+    public static function execute_parameters() {
+        return new external_function_parameters([]);
+    }
+
+    /**
+     * Execute WS: send global stats to AI and return analysis.
+     */
+    public static function execute() {
+        global $DB;
+
+        $params = self::validate_parameters(self::execute_parameters(), []);
+
+        // Context validation.
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        // === 1. Build body with totals ===
+        $totalcourses = $DB->count_records('course', ['visible' => 1]);
+
+        $sqlactivities = "
+            SELECT COUNT(cm.id)
+              FROM {course_modules} cm
+              JOIN {course} c ON c.id = cm.course
+             WHERE c.visible = 1
+        ";
+        $totalactivities = $DB->count_records_sql($sqlactivities);
+
+        $sqlrated = "SELECT COUNT(DISTINCT r.cmid) FROM {local_datacurso_ratings} r";
+        $ratedactivities = $DB->count_records_sql($sqlrated);
+
+        $sqlratings = "
+            SELECT 
+                SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
+                SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes
+              FROM {local_datacurso_ratings} r
+        ";
+        $stats = $DB->get_record_sql($sqlratings);
+        $likes = (int)($stats->likes ?? 0);
+        $dislikes = (int)($stats->dislikes ?? 0);
+
+        $approvalpercent = ($likes + $dislikes) > 0 
+            ? round(($likes * 100) / ($likes + $dislikes)) 
+            : 0;
+
+        $body = [
+            'total_courses'    => $totalcourses,
+            'total_activities' => $totalactivities,
+            'rated_activities' => $ratedactivities,
+            'approvalpercent'  => $approvalpercent,
+            'like'             => $likes,
+            'dislike'          => $dislikes,
+        ];
+
+        // === 2. Call AI service (client) ===
+        $client = new ai_services_api();
+        $response = $client->request('POST', 'rating/general', $body);
+
+        // === 3. Return AI response ===
+        return [
+            'analysis' => $response['reply'] ?? '',
+        ];
+    }
+
+    /**
+     * Return structure.
+     */
+    public static function execute_returns() {
+        return new external_single_structure([
+            'analysis' => new external_value(PARAM_RAW, 'Análisis generado por la IA'),
+        ]);
+    }
+}

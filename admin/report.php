@@ -54,6 +54,6 @@ echo '<div id="general-ratings-report-container"
 $PAGE->requires->js_call_amd('local_datacurso_ratings/ratings_report', 'init', []);
 $PAGE->requires->js_call_amd('local_datacurso_ratings/comments_modal', 'init');
 $PAGE->requires->js_call_amd('local_datacurso_ratings/get_ai_analysis_comments', 'init');
-
+$PAGE->requires->js_call_amd('local_datacurso_ratings/get_ai_analysis_global', 'init');
 
 echo $OUTPUT->footer();

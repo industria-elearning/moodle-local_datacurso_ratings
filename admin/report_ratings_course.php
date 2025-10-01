@@ -54,5 +54,6 @@ echo '<div id="ratings-report-container"></div>';
 $PAGE->requires->js_call_amd('local_datacurso_ratings/ratings_report_course', 'init', [$courseid]);
 $PAGE->requires->js_call_amd('local_datacurso_ratings/comments_modal', 'init');
 $PAGE->requires->js_call_amd('local_datacurso_ratings/get_ai_analysis_comments', 'init');
+$PAGE->requires->js_call_amd('local_datacurso_ratings/get_ai_analysis_course', 'init', [$courseid]);
 
 echo $OUTPUT->footer();
