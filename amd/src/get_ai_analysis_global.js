@@ -21,7 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* eslint-disable */
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -44,10 +43,10 @@
  * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 /* eslint-disable */
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
+import {get_string as getString} from 'core/str';
 
 export const init = () => {
     document.addEventListener('click', e => {
@@ -60,13 +59,14 @@ export const init = () => {
 
         // Loading state
         button.disabled = true;
-        button.innerHTML = 'Generando análisis... ⏳';
+        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Generando análisis...';
         resultContainer.innerHTML = '';
 
         Ajax.call([{
             methodname: 'local_datacurso_ratings_get_ai_analysis_global',
             args: {},
-        }])[0].done(response => {
+        }])[0].done( async(response )=> {
+            const generatecommenterror = await getString('generatecommentaierror', 'local_datacurso_ratings');
             if (response && response.analysis) {
                 resultContainer.innerHTML = `
                     <div class="alert alert-info">
@@ -74,7 +74,7 @@ export const init = () => {
                         <p>${response.analysis}</p>
                     </div>`;
             } else {
-                resultContainer.innerHTML = `<div class="alert alert-warning">No se recibió respuesta de la IA.</div>`;
+                resultContainer.innerHTML = `<div class="alert alert-warning">${generatecommenterror}</div>`;
             }
         }).fail(Notification.exception).always(() => {
             button.disabled = false;

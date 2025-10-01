@@ -109,7 +109,7 @@ class get_ai_analysis_course extends external_api {
                 'like' => $actlikes,
                 'dislike' => $actdislikes,
                 'approvalpercent' => $approvalpercent,
-                'name' => $cm->modname . ' ' . $cm->id, // puedes personalizar nombre real
+                'name' => $cm->modname . ' ' . $cm->id,
             ];
         }
 

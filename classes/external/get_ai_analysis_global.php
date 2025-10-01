@@ -55,7 +55,7 @@ class get_ai_analysis_global extends external_api {
         $context = context_system::instance();
         self::validate_context($context);
 
-        // === 1. Build body with totals ===
+        // 1. Build body with totals.
         $totalcourses = $DB->count_records('course', ['visible' => 1]);
 
         $sqlactivities = "
@@ -70,7 +70,7 @@ class get_ai_analysis_global extends external_api {
         $ratedactivities = $DB->count_records_sql($sqlrated);
 
         $sqlratings = "
-            SELECT 
+            SELECT
                 SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
                 SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes
               FROM {local_datacurso_ratings} r
@@ -79,8 +79,8 @@ class get_ai_analysis_global extends external_api {
         $likes = (int)($stats->likes ?? 0);
         $dislikes = (int)($stats->dislikes ?? 0);
 
-        $approvalpercent = ($likes + $dislikes) > 0 
-            ? round(($likes * 100) / ($likes + $dislikes)) 
+        $approvalpercent = ($likes + $dislikes) > 0
+            ? round(($likes * 100) / ($likes + $dislikes))
             : 0;
 
         $body = [
@@ -92,11 +92,11 @@ class get_ai_analysis_global extends external_api {
             'dislike'          => $dislikes,
         ];
 
-        // === 2. Call AI service (client) ===
+        // 2. Call AI service (client).
         $client = new ai_services_api();
         $response = $client->request('POST', 'rating/general', $body);
 
-        // === 3. Return AI response ===
+        // 3. Return AI response.
         return [
             'analysis' => $response['reply'] ?? '',
         ];
