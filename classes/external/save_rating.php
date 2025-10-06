@@ -32,7 +32,7 @@ require_once($CFG->libdir . '/externallib.php');
  *
  * @package    local_datacurso_ratings
  * @category   external
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @copyright  2025 Developer <developer@datacurso.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_rating extends external_api {
@@ -79,6 +79,11 @@ class save_rating extends external_api {
             throw new invalid_parameter_exception('Invalid rating value. Must be 0 or 1.');
         }
 
+        // Get course and category.
+        $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+        $courseid = (int)$course->id;
+        $categoryid = (int)$course->category;
+
         $now = time();
         $record = $DB->get_record(
             'local_datacurso_ratings',
@@ -88,6 +93,8 @@ class save_rating extends external_api {
         $data = (object)[
             'cmid' => $cm->id,
             'userid' => $USER->id,
+            'courseid' => $courseid,
+            'categoryid' => $categoryid,
             'rating' => $r,
             'feedback' => (string)$params['feedback'],
             'timemodified' => $now,

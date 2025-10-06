@@ -15,47 +15,73 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Upgrade steps for Datacurso Ratings
- *
- * Documentation: {@link https://moodledev.io/docs/guides/upgrade}
+ * Upgrade steps for Datacurso Ratings.
  *
  * @package    local_datacurso_ratings
  * @category   upgrade
- * @copyright  2025 Buendata <soluciones@buendata.com>
+ * @copyright  2025 Buendata
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Execute the plugin upgrade steps from the given old version.
+ * Executes upgrade steps for the Datacurso Ratings plugin.
  *
- * @param int $oldversion
- * @return bool
+ * @param int $oldversion The old version number.
+ * @return bool True on success.
  */
 function xmldb_local_datacurso_ratings_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2025091000) {
-
         // Define table local_datacurso_ratings_feedback to be created.
         $table = new xmldb_table('local_datacurso_ratings_feedback');
 
-        // Adding fields to table local_datacurso_ratings_feedback.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('feedbacktext', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-        // Adding keys to table local_datacurso_ratings_feedback.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
-        // Conditionally launch create table for local_datacurso_ratings_feedback.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
-        // Datacurso_ratings savepoint reached.
+        // Savepoint after table creation.
         upgrade_plugin_savepoint(true, 2025091000, 'local', 'datacurso_ratings');
+    }
+
+    // New upgrade step: Add courseid and categoryid fields to the ratings table.
+    if ($oldversion < 2025100100) {
+
+        $table = new xmldb_table('local_datacurso_ratings');
+
+        // Add courseid field.
+        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'cmid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add categoryid field.
+        $field = new xmldb_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'courseid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add indexes to improve query performance.
+        $index1 = new xmldb_index('courseid_idx', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+        if (!$dbman->index_exists($table, $index1)) {
+            $dbman->add_index($table, $index1);
+        }
+
+        $index2 = new xmldb_index('categoryid_idx', XMLDB_INDEX_NOTUNIQUE, ['categoryid']);
+        if (!$dbman->index_exists($table, $index2)) {
+            $dbman->add_index($table, $index2);
+        }
+
+        // Savepoint after structure modification.
+        upgrade_plugin_savepoint(true, 2025100100, 'local', 'datacurso_ratings');
     }
 
     return true;

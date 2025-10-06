@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/datacurso_ratings/db" VERSION="2025090900" COMMENT="XMLDB file for local_datacurso_ratings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<XMLDB PATH="local/datacurso_ratings/db" VERSION="2025100101" COMMENT="XMLDB file for local_datacurso_ratings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <TABLES>
     <TABLE NAME="local_datacurso_ratings" COMMENT="User ratings for course modules">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID del curso al que pertenece la actividad"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID de la categoría del curso"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="rating" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0 = negative, 1 = positive"/>
+        <FIELD NAME="rating" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0 = dislike, 1 = like"/>
         <FIELD NAME="feedback" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -18,19 +20,21 @@
         <INDEX NAME="cmid_userid_uix" UNIQUE="true" FIELDS="cmid, userid"/>
         <INDEX NAME="cmid_idx" UNIQUE="false" FIELDS="cmid"/>
         <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="courseid_idx" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="categoryid_idx" UNIQUE="false" FIELDS="categoryid"/>
       </INDEXES>
     </TABLE>
-    
+
     <TABLE NAME="local_datacurso_ratings_feedback" COMMENT="Frases preestablecidas para feedback de calificaciones">
-        <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-            <FIELD NAME="feedbacktext" TYPE="text" NOTNULL="true" COMMENT="Texto de la frase o palabra preestablecida" SEQUENCE="false"/>
-            <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Fecha de creación" SEQUENCE="false"/>
-            <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Última modificación" SEQUENCE="false"/>
-        </FIELDS>
-        <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        </KEYS>
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="feedbacktext" TYPE="text" NOTNULL="true" COMMENT="Texto de la frase o palabra preestablecida" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Fecha de creación" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Última modificación" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>
