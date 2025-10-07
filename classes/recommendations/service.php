@@ -38,8 +38,8 @@ class service {
     public static function get_recommendations_for_user(int $userid, int $limit = 5): array {
         global $DB;
 
-        // 1) User preferences by category.
-        $sql = "
+        // 1. Preferencias del usuario por categoría (solo una query).
+        $sqlusercats = "
             SELECT r.categoryid,
                    SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
                    SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes
@@ -47,99 +47,87 @@ class service {
              WHERE r.userid = :userid
           GROUP BY r.categoryid
         ";
-        $catstats = $DB->get_records_sql($sql, ['userid' => $userid]);
+        $catprefs = $DB->get_records_sql($sqlusercats, ['userid' => $userid]);
 
         $categorypref = [];
-        foreach ($catstats as $row) {
-            $likes = (int)($row->likes ?? 0);
-            $dislikes = (int)($row->dislikes ?? 0);
+        foreach ($catprefs as $c) {
+            $likes = (int)($c->likes ?? 0);
+            $dislikes = (int)($c->dislikes ?? 0);
             $total = $likes + $dislikes;
-            $ratio = $total > 0 ? ($likes / $total) : null;
-            $categorypref[(int)$row->categoryid] = $ratio;
+            $categorypref[$c->categoryid] = $total > 0 ? ($likes / $total) : null;
         }
 
-        // 2) Global rating statistics.
-        $sqlglobal = "
-            SELECT SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) AS likes,
-                   SUM(CASE WHEN rating = 0 THEN 1 ELSE 0 END) AS dislikes
-              FROM {local_datacurso_ratings}
-        ";
-        $g = $DB->get_record_sql($sqlglobal);
-        $globallikes = (int)($g->likes ?? 0);
-        $globaldislikes = (int)($g->dislikes ?? 0);
+        // 2. Ratio global.
+        $global = $DB->get_record_sql("
+            SELECT 
+                SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) AS likes,
+                SUM(CASE WHEN rating = 0 THEN 1 ELSE 0 END) AS dislikes
+            FROM {local_datacurso_ratings}
+        ");
+        $globallikes = (int)($global->likes ?? 0);
+        $globaldislikes = (int)($global->dislikes ?? 0);
         $globalratio = ($globallikes + $globaldislikes) > 0
             ? ($globallikes / ($globallikes + $globaldislikes))
             : 0.5;
 
-        // 3) Get enrolled courses to exclude them from recommendations.
+        // 3. Cursos en los que ya está inscrito (para excluir).
         $enrolledids = [];
         if (function_exists('enrol_get_users_courses')) {
-            $usercourses = enrol_get_users_courses($userid, true);
-            $enrolledids = array_keys($usercourses);
+            $enrolledids = array_keys(enrol_get_users_courses($userid, true));
         }
 
-        // 4) Get visible candidate courses (exclude site course).
+        // 4. Obtener todos los cursos visibles con estadísticas agregadas en una sola query.
+        $params = ['siteid' => SITEID];
         $sqlcourses = "
-            SELECT id, fullname, category
-              FROM {course}
-             WHERE visible = 1
-               AND id <> :siteid
+            SELECT c.id AS courseid,
+                   c.fullname,
+                   c.category,
+                   COALESCE(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END), 0) AS likes,
+                   COALESCE(SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END), 0) AS dislikes
+              FROM {course} c
+         LEFT JOIN {local_datacurso_ratings} r ON r.courseid = c.id
+             WHERE c.visible = 1
+               AND c.id <> :siteid
+          GROUP BY c.id, c.fullname, c.category
         ";
-        $courses = $DB->get_records_sql($sqlcourses, ['siteid' => SITEID]);
 
-        $candidates = [];
+        $courses = $DB->get_records_sql($sqlcourses, $params);
 
+        // 5. Calcular score de cada curso.
+        $recommendations = [];
         foreach ($courses as $course) {
-            $courseid = (int)$course->id;
-
-            // Skip if user already enrolled.
+            $courseid = (int)$course->courseid;
             if (in_array($courseid, $enrolledids, true)) {
                 continue;
             }
 
-            // 5) Course satisfaction from ratings table.
-            $sqlcourse = "
-                SELECT SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) AS likes,
-                       SUM(CASE WHEN rating = 0 THEN 1 ELSE 0 END) AS dislikes
-                  FROM {local_datacurso_ratings}
-                 WHERE courseid = :courseid
-            ";
-            $cr = $DB->get_record_sql($sqlcourse, ['courseid' => $courseid]);
-            $courselikes = (int)($cr->likes ?? 0);
-            $coursedislikes = (int)($cr->dislikes ?? 0);
-            $coursetotal = $courselikes + $coursedislikes;
-            $coursesatisfaction = $coursetotal > 0 ? round(($courselikes / $coursetotal) * 100, 2) : 0.0;
+            $likes = (int)$course->likes;
+            $dislikes = (int)$course->dislikes;
+            $total = $likes + $dislikes;
+            $satisfaction = $total > 0 ? round(($likes / $total) * 100, 2) : 0.0;
 
-            // 6) User preference for course category (fall back to global).
             $catid = (int)$course->category;
             $usercatratio = $categorypref[$catid] ?? null;
-            $catratioused = $usercatratio !== null ? $usercatratio : $globalratio;
-            $catpercent = round($catratioused * 100, 2);
+            $catratio = $usercatratio !== null ? $usercatratio : $globalratio;
+            $catpercent = round($catratio * 100, 2);
 
-            // 7) Combined score (60% category preference + 40% course satisfaction).
-            $score = (0.6 * $catpercent) + (0.4 * $coursesatisfaction);
+            $score = (0.6 * $catpercent) + (0.4 * $satisfaction);
 
-            $candidates[] = [
+            $recommendations[] = [
                 'courseid' => $courseid,
                 'fullname' => $course->fullname,
                 'categoryid' => $catid,
-                'course_satisfaction' => $coursesatisfaction,
+                'course_satisfaction' => $satisfaction,
                 'category_preference_pct' => $catpercent,
-                'score' => round($score, 2),
+                'score' => round($score, 2)
             ];
         }
 
-        // 8) Sort by score descending.
-        usort($candidates, static function($a, $b) {
-            return $b['score'] <=> $a['score'];
-        });
+        // 6. Ordenar y filtrar.
+        usort($recommendations, static fn($a, $b) => $b['score'] <=> $a['score']);
+        $filtered = array_filter($recommendations, static fn($r) => $r['category_preference_pct'] >= 80);
 
-        // 9) Filter by minimum category preference (>= 80%).
-        $filtered = array_filter($candidates, static function($c) {
-            return ($c['category_preference_pct'] ?? 0) >= 80.0;
-        });
-
-        // 10) Return top N (limit).
-        return array_slice(array_values($filtered), 0, max(0, (int)$limit));
+        // 7. Devolver top N.
+        return array_slice(array_values($filtered), 0, max(0, $limit));
     }
 }
