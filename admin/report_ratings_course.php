@@ -45,7 +45,8 @@ $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add(get_string('activityratingsreport', 'local_datacurso_ratings'));
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('activityratingsreport', 'local_datacurso_ratings'));
+$headerlogo = new \local_datacurso_ratings\output\header_logo();
+echo $OUTPUT->render($headerlogo);
 
 // Container for the report (will be populated by JavaScript).
 echo '<div id="ratings-report-container"></div>';

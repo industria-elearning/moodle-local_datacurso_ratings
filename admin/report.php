@@ -32,7 +32,6 @@ $PAGE->set_url(new moodle_url('/local/datacurso_ratings/admin/report.php'));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('ratingsreport', 'local_datacurso_ratings'));
-$PAGE->set_heading(get_string('ratingsreport', 'local_datacurso_ratings'));
 
 // Get categories.
 $categorieslist = core_course_category::make_categories_list();
@@ -46,6 +45,8 @@ foreach ($categorieslist as $id => $name) {
 }
 
 echo $OUTPUT->header();
+$headerlogo = new \local_datacurso_ratings\output\header_logo();
+echo $OUTPUT->render($headerlogo);
 
 echo '<div id="general-ratings-report-container"
           data-categories="' . htmlentities(json_encode($categories)) . '">
