@@ -8,11 +8,11 @@ Educators can instantly generate AI-based analyses of student engagement and sat
 
 ## Key Features
 
-- ⭐ **Student Activity Ratings** – Allow students to rate each course activity or resource with a clean, user-friendly interface.  
-- 🧠 **AI-Powered Analysis** – Automatically summarize and interpret ratings to uncover trends, strengths, and improvement areas.  
-- 📊 **Visual Reports** – Display summarized insights and AI-generated feedback directly within the course.  
-- 🔒 **Seamless Integration** – Works in sync with the **DataCurso AI Provider**, using your Moodle AI token credits.  
-- 💬 **Instructor Insights** – Provide teachers with quick, data-driven overviews to improve content and engagement.  
+- **Student Activity Ratings** – Allow students to rate each course activity or resource with a clean, user-friendly interface.  
+- **AI-Powered Analysis** – Automatically summarize and interpret ratings to uncover trends, strengths, and improvement areas.  
+- **Visual Reports** – Display summarized insights and AI-generated feedback directly within the course.  
+- **Seamless Integration** – Works in sync with the **DataCurso AI Provider**, using your Moodle AI token credits.  
+- **Instructor Insights** – Provide teachers with quick, data-driven overviews to improve content and engagement.  
 
 ## Pre-requisites
 
@@ -98,7 +98,7 @@ After collecting student ratings, educators can click **“Generate AI Analysis�
 
    - When viewing the comments of a specific activity, you can also generate an AI analysis of the comments.
 
-   ![Activity AI Analysis](./_docs/images/local_datacurso_ratings_report-global-ai-comment-activitie.png)
+   ![Activity AI Analysis](./_docs/images/local_datacurso_ratings_report-course-analysis-ai-comments-activitie.png)
 
 ## Student Rating
 
@@ -135,8 +135,7 @@ After collecting student ratings, educators can click **“Generate AI Analysis�
 
 - Additionally, they can generate AI analyses of activity comments.
 
-  ![Comments Activity](./_docs/images/local_datacurso_ratings_report-course-analysis-ai-comments-activitie-result.png)
-
+  ![Comments Activity](./_docs/images/local_datacurso_ratings_report-course-analysis-ai-comments-activitie.png)
 
 ## License ##
 
