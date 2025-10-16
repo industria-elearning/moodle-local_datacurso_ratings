@@ -98,7 +98,7 @@ After collecting student ratings, educators can click **â€œGenerate AI Analysisâ
 
    - When viewing the comments of a specific activity, you can also generate an AI analysis of the comments.
 
-   ![Activity AI Analysis](./_docs/images/local_datacurso_ratings_report-course-analysis-ai-comments-activitie.png)
+   ![Activity AI Analysis](./_docs/images/local_datacurso_ratings_report-global-ai-comment-activitie.png)
 
 ## Student Rating
 
@@ -135,9 +135,7 @@ After collecting student ratings, educators can click **â€œGenerate AI Analysisâ
 
 - Additionally, they can generate AI analyses of activity comments.
 
-  ![Comments Activity](./_docs/images/local_datacurso_ratings_report-course-analysis-ai-comments-activitie.png)
-
-  ![AI Result](./_docs/images/local_datacurso_ratings_report-course-analysis-ai-comments-activitie-result.png)
+  ![Comments Activity](./_docs/images/local_datacurso_ratings_report-course-analysis-ai-comments-activitie-result.png)
 
 
 ## License ##
