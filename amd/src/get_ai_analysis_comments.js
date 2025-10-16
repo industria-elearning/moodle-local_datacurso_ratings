@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module get_ai_analysis_comments
+ * AI Analysis Comments Module.
  *
  * @module     local_datacurso_ratings/get_ai_analysis_comments
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
@@ -24,34 +24,41 @@
 /* eslint-disable */
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
+import {get_string as getString} from 'core/str';
 
 export const init = () => {
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', async function(e) {
         if (e.target.classList.contains('btn-generate-ai-activitie') || e.target.closest('.btn-generate-ai-activitie')) {
             e.preventDefault();
 
             const button = e.target.closest('.btn-generate-ai-activitie');
             const cmid = button.getAttribute('data-cmid');
-            // Ahora buscamos dentro del padre más cercano (el div .mb-3)
             const container = button.closest('.mb-3');
             const resultContainer = container.querySelector('.ai-analysis-result');
 
             if (!cmid || !resultContainer) {
-                console.warn('No se encontró cmid o contenedor para resultado');
+                console.warn('Missing cmid or result container');
                 return;
             }
 
+            // Get localized string for "Generating analysis..."
+            const generatingText = await getString('generatecommentaiprocess', 'local_datacurso_ratings');
+
             resultContainer.innerHTML = `<div class="text-muted">
-                <i class="fa fa-spinner fa-spin"></i> Generando análisis...
+                <i class="fa fa-spinner fa-spin"></i> ${generatingText}
             </div>`;
 
             Ajax.call([{
                 methodname: 'local_datacurso_ratings_get_ai_analysis_comments',
                 args: { cmid: parseInt(cmid, 10) }
             }])[0]
-            .then(data => {
+            .then(async data => {
+                // Get localized string for analysis result wrapper
+                const analysisTitle = await getString('analysisresult', 'local_datacurso_ratings');
+
                 resultContainer.innerHTML = `
                     <div class="alert alert-info p-2 mb-2">
+                        <strong>${analysisTitle}</strong><br>
                         ${data.ai_analysis_comment}
                     </div>`;
             })

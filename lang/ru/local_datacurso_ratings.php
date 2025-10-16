@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,95 +12,99 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'local_datacurso_ratings', language 'ru'
+ * Plugin strings are defined here.
  *
- * @package    local_datacurso_ratings
- * @category   string
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_datacurso_ratings
+ * @category    string
+ * @copyright   Josue <josue@datacurso.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $string['actions'] = 'Действия';
-$string['activities'] = 'Деятельность';
+$string['activities'] = 'Активности';
 $string['activity'] = 'Активность';
-$string['activityratingsreport'] = 'Отчет об оценках активности/ресурсов';
-$string['addfeedback'] = 'Новое предопределённое сообщение или ответ';
-$string['allCourses'] = 'Все курсы';
-$string['approval'] = 'Одобрение';
+$string['activityratingsreport'] = 'Отчет об оценках активностей/ресурсов';
+$string['addfeedback'] = 'Новый предопределенный отзыв или ответ';
+$string['allcategories'] = 'Все категории';
+$string['allcourses'] = 'Все курсы';
+$string['analysisresult'] = 'Результат анализа ИИ';
+$string['approval'] = 'Утверждение';
 $string['avgLength'] = 'Средняя длина';
-$string['cancel'] = 'Отмена';
+$string['cancel'] = 'Отменить';
 $string['clear'] = 'Очистить';
 $string['comment'] = 'Комментарий';
-$string['commentlabel'] = 'Есть ли у вас дополнительные комментарии?';
+$string['commentlabel'] = 'У вас есть дополнительные комментарии?';
 $string['commentplaceholder'] = 'Напишите свой комментарий здесь... (необязательно)';
 $string['comments'] = 'Комментарии';
 $string['course'] = 'Курс';
 $string['currentstats'] = 'Текущая статистика';
-$string['datacurso_ratings:manage'] = 'Управление настройками Datacurso Ratings';
+$string['datacurso_ratings:manage'] = 'Управлять настройками оценок datacurso';
 $string['datacurso_ratings:rate'] = 'Оценивать активности';
-$string['datacurso_ratings:viewreports'] = 'Просмотр отчетов об оценках активностей';
+$string['datacurso_ratings:viewreports'] = 'Просматривать отчеты об оценках активностей';
 $string['date'] = 'Дата';
 $string['detailedReport'] = 'Подробный отчет';
 $string['dislike'] = 'Не нравится';
 $string['dislikes'] = 'Не нравится';
 $string['enableplugin'] = 'Включить плагин в курсах';
-$string['enableplugin_desc'] = 'Если отмечено, плагин будет автоматически применён ко всем новым курсам.';
+$string['enableplugin_desc'] = 'Если отмечено, плагин будет автоматически применяться ко всем новым курсам.';
 $string['existingfeedback'] = 'Существующий отзыв';
-$string['exportcsv'] = 'Экспорт в CSV';
+$string['exportcsv'] = 'Экспортировать CSV';
 $string['feedbackdeleted'] = 'Фраза успешно удалена';
 $string['feedbacklabel'] = 'Отправьте нам свой комментарий (необязательно)';
 $string['feedbackplaceholder'] = 'Опишите свой опыт...';
 $string['feedbackresponses'] = 'Ответы на отзывы';
-$string['feedbacksaved'] = 'Отзыв успешно сохранён';
+$string['feedbacksaved'] = 'Отзыв успешно сохранен';
 $string['filterplaceholder'] = 'Фильтровать по курсу, активности или комментарию...';
-$string['frequentWords'] = 'Часто встречающиеся слова';
+$string['frequentWords'] = 'Частые слова';
 $string['generalsettings'] = 'Общие настройки';
-$string['generatecommentai'] = 'Создать комментарии с помощью ИИ';
-$string['generatecommentaicourse'] = 'Создать анализ курса с помощью ИИ';
-$string['generatecommentaierror'] = 'Не удалось создать анализ ИИ...';
-$string['generatecommentaiglobal'] = 'Создать глобальный анализ с помощью ИИ';
-$string['generatecommentaiprocess'] = 'Создание анализа ИИ...';
+$string['generatecommentai'] = 'Сгенерировать анализ комментариев с помощью ИИ';
+$string['generatecommentaicourse'] = 'Сгенерировать анализ курса с помощью ИИ';
+$string['generatecommentaierror'] = 'ИИ не сгенерирован.... ';
+$string['generatecommentaiglobal'] = 'Сгенерировать глобальный анализ с помощью ИИ';
+$string['generatecommentaiprocess'] = 'Генерация анализа ИИ.... ';
 $string['getStarted'] = 'Начать';
 $string['getStartedDescription'] = 'Как только студенты начнут оценивать активности и ресурсы, их отзывы появятся здесь в подробных отчетах.';
 $string['globalReportSummary'] = 'Сводка глобального отчета';
-$string['globalSatisfaction'] = 'Глобальное удовлетворение';
+$string['globalSatisfaction'] = 'Глобальная удовлетворенность';
 $string['like'] = 'Нравится';
 $string['likecomment'] = 'Комментарий (необязательно)';
 $string['likes'] = 'Нравится';
 $string['loading'] = 'Загрузка...';
-$string['managefeedback'] = 'Управление предопределёнными ответами';
+$string['managefeedback'] = 'Управлять предопределенными ответами';
+$string['managefeedbackdislike'] = 'Предопределенные ответы не нравится 👎';
+$string['managefeedbacklike'] = 'Предопределенные ответы нравится 👍';
 $string['negativeComments'] = 'Негативные комментарии';
-$string['next'] = 'Далее';
+$string['next'] = 'Следующий';
 $string['noComments'] = 'Нет комментариев';
 $string['noCommentsFound'] = 'Комментарии не найдены';
 $string['noDataAvailable'] = 'Нет доступных данных';
-$string['noDataDescription'] = 'Пока ещё нет оценок для активностей этого курса.';
-$string['noGlobalDataAvailable'] = 'Нет глобальных данных';
-$string['noGlobalDataDescription'] = 'Пока ещё нет оценок для активностей во всех курсах.';
+$string['noDataDescription'] = 'Для активностей в этом курсе еще не были отправлены оценки.';
+$string['noGlobalDataAvailable'] = 'Нет доступных глобальных данных';
+$string['noGlobalDataDescription'] = 'Для активностей во всех курсах еще не были отправлены оценки.';
 $string['noRatings'] = 'Нет оценок';
-$string['nodata'] = 'Нет данных в отчёте.';
-$string['nofeedback'] = 'Отзывы ещё не добавлены';
-$string['nostatsavailable'] = 'Статистика пока недоступна. Оценки появятся здесь, когда студенты начнут оценивать активности.';
+$string['nodata'] = 'Нет данных в отчете.';
+$string['nofeedback'] = 'Отзывы еще не добавлены';
+$string['nostatsavailable'] = 'Статистика пока недоступна. Оценки появятся здесь, как только студенты начнут оценивать активности.';
 $string['of'] = 'из';
 $string['pages'] = 'страницы';
-$string['pluginname'] = 'Datacurso Ratings';
-$string['positiveComments'] = 'Положительные комментарии';
-$string['previous'] = 'Назад';
+$string['pluginname'] = 'Рейтинг Активностей ИИ';
+$string['positiveComments'] = 'Позитивные комментарии';
+$string['previous'] = 'Предыдущий';
 $string['print'] = 'Печать';
-$string['privacy:metadata:local_datacurso_ratings'] = 'Хранит оценки пользователей для модулей курса.';
+$string['privacy:metadata:local_datacurso_ratings'] = 'Хранит пользовательские оценки для модулей курса.';
 $string['privacy:metadata:local_datacurso_ratings:cmid'] = 'Модуль курса, который оценивается.';
-$string['privacy:metadata:local_datacurso_ratings:feedback'] = 'Необязательный текст отзыва, предоставленный вместе с оценкой.';
+$string['privacy:metadata:local_datacurso_ratings:feedback'] = 'Необязательный текст отзыва, предоставленный с оценкой.';
 $string['privacy:metadata:local_datacurso_ratings:rating'] = 'Значение оценки (0 = отрицательная, 1 = положительная).';
-$string['privacy:metadata:local_datacurso_ratings:timecreated'] = 'Время создания оценки.';
-$string['privacy:metadata:local_datacurso_ratings:timemodified'] = 'Время последнего изменения оценки.';
-$string['privacy:metadata:local_datacurso_ratings:userid'] = 'ID пользователя, создавшего оценку.';
+$string['privacy:metadata:local_datacurso_ratings:timecreated'] = 'Время, когда была создана оценка.';
+$string['privacy:metadata:local_datacurso_ratings:timemodified'] = 'Время, когда оценка была последний раз изменена.';
+$string['privacy:metadata:local_datacurso_ratings:userid'] = 'ID пользователя, который создал оценку.';
 $string['rateactivity'] = 'Оценить эту активность';
-$string['ratedActivities'] = 'Оценённые активности';
+$string['ratedActivities'] = 'Оцененные активности';
 $string['ratedthanks'] = 'Спасибо за вашу оценку!';
 $string['rating'] = 'Оценка';
 $string['ratingsaved'] = 'Оценка успешно сохранена!';
@@ -114,10 +118,12 @@ $string['satisfaction'] = 'Уровень удовлетворенности';
 $string['savefeedback'] = 'Сохранить отзыв';
 $string['searchActivities'] = 'Поиск активностей...';
 $string['searchInComments'] = 'Поиск в комментариях';
+$string['searchcategories'] = 'Поиск категорий';
+$string['searchcourses'] = 'Поиск курсов';
 $string['send'] = 'Отправить';
 $string['settingstitle'] = 'Общие настройки';
-$string['showing'] = 'Показ страницы';
-$string['studentFeedback'] = 'Отзывы студентов';
+$string['showing'] = 'Показана страница';
+$string['studentFeedback'] = 'Отзыв студента';
 $string['total'] = 'всего';
 $string['totalActivities'] = 'Всего активностей';
 $string['totalComments'] = 'Всего комментариев';

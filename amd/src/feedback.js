@@ -14,72 +14,44 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module feedback
+ * Feedback module logic.
  *
  * @module     local_datacurso_ratings/feedback
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// This file is part of Moodle - http://moodle.org/
-//
-// @module     local_datacurso_ratings/feedback
-// @copyright  2025 Industria Elearning
-// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-
-// This file is part of Moodle - http://moodle.org/
-//
-// @module     local_datacurso_ratings/feedback
-// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-
 /* eslint-disable */
 import Ajax from "core/ajax";
 import Notification from "core/notification";
 
 /**
- * Enviar nuevo feedback vía AJAX.
+ * Send new feedback via AJAX.
  *
- * @param {string} feedbacktext Texto del feedback que se va a agregar.
- * @returns {Promise<object>} Respuesta del servidor.
+ * @param {string} feedbacktext Feedback text.
+ * @param {string} type Feedback type (like/dislike).
+ * @returns {Promise<object>} Server response.
  */
-function addFeedback(feedbacktext) {
+function addFeedback(feedbacktext, type) {
     const requests = Ajax.call([{
         methodname: "local_datacurso_ratings_add_feedback",
-        args: { feedbacktext }
+        args: { feedbacktext, type }
     }]);
 
     return requests[0];
 }
 
-/**
- * Eliminar feedback vía AJAX.
- *
- * @param {number|string} id ID del feedback que se quiere eliminar.
- * @returns {Promise<object>} Respuesta del servidor.
- */
-function deleteFeedback(id) {
-    const requests = Ajax.call([{
-        methodname: "local_datacurso_ratings_delete_feedback",
-        args: { id }
-    }]);
-
-    return requests[0];
-}
-
-/**
- * Inicializar listeners en el panel admin.
- *
- * @returns {void}
- */
 export function init() {
-    const form = document.querySelector(".feedback-admin form");
-    const list = document.querySelector(".feedback-list");
+    const container = document.querySelector(".feedback-admin");
+    const form = container?.querySelector("form");
+    const list = container?.querySelector(".feedback-list");
+    const type = container?.dataset.type;
 
-    if (!form || !list) {
+    if (!form || !list || !type) {
         return;
     }
 
-    // Agregar nuevo feedback
+    // Add new feedback
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         const input = form.querySelector("input[name='feedbacktext']");
@@ -87,11 +59,11 @@ export function init() {
             return;
         }
 
-        addFeedback(input.value.trim())
+        addFeedback(input.value.trim(), type)
             .then((resp) => {
                 Notification.addNotification({ message: resp.message, type: "success" });
 
-                // Agregar dinámicamente a la lista
+                // Dynamically add the new feedback to the list
                 const li = document.createElement("li");
                 li.className = "feedback-item list-group-item d-flex justify-content-between align-items-center";
                 li.innerHTML = `
@@ -104,12 +76,17 @@ export function init() {
             .catch(Notification.exception);
     });
 
-    // Eliminar feedback
+    // Delete feedback
     list.addEventListener("click", (e) => {
         if (e.target.classList.contains("btn-delete")) {
             const id = e.target.dataset.id;
 
-            deleteFeedback(id)
+            const requests = Ajax.call([{
+                methodname: "local_datacurso_ratings_delete_feedback",
+                args: { id }
+            }]);
+
+            requests[0]
                 .then((resp) => {
                     Notification.addNotification({ message: resp.message, type: "success" });
                     e.target.closest("li").remove();

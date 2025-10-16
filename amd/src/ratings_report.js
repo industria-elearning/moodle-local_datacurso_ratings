@@ -142,7 +142,7 @@ function processGeneralReportData(data, categories) {
     return {
         courses: coursesArray,
         has_data: coursesArray.length > 0,
-        categories: categories, // <= aquí se pasa al mustache
+        categories: categories, 
         summary: {
             total_courses: coursesArray.length,
             total_activities: totalActivities,

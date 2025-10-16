@@ -31,9 +31,35 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('managefeedback', 'local_datacurso_ratings'));
 $PAGE->set_heading(get_string('managefeedback', 'local_datacurso_ratings'));
 
-echo $OUTPUT->header();
 
-// Renderable + Renderer.
-$renderable = new \local_datacurso_ratings\output\feedback_page();
-echo $OUTPUT->render($renderable);
+$tab = optional_param('tab', 'responselike', PARAM_ALPHA);
+
+$tabs = [];
+$tabs[] = new tabobject(
+    'responselike',
+    new moodle_url('/local/datacurso_ratings/admin/feedback.php', ['tab' => 'responselike']),
+    get_string('managefeedbacklike', 'local_datacurso_ratings')
+);
+
+$tabs[] = new tabobject(
+    'responsedislike',
+    new moodle_url('/local/datacurso_ratings/admin/feedback.php', ['tab' => 'responsedislike']),
+    get_string('managefeedbackdislike', 'local_datacurso_ratings')
+);
+
+echo $OUTPUT->header();
+echo $OUTPUT->tabtree($tabs, $tab);
+
+switch ($tab) {
+    case 'responselike':
+        $renderable = new \local_datacurso_ratings\output\feedback_page('like');
+        echo $OUTPUT->render($renderable);
+        break;
+
+    case 'responsedislike':
+        $renderable = new \local_datacurso_ratings\output\feedback_page('dislike');
+        echo $OUTPUT->render($renderable);
+        break;
+}
+
 echo $OUTPUT->footer();

@@ -27,7 +27,6 @@ namespace local_datacurso_ratings\recommendations;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class service {
-
     /**
      * Get recommended courses for a specific user.
      *
@@ -59,7 +58,7 @@ class service {
 
         // 2. Ratio global.
         $global = $DB->get_record_sql("
-            SELECT 
+            SELECT
                 SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) AS likes,
                 SUM(CASE WHEN rating = 0 THEN 1 ELSE 0 END) AS dislikes
             FROM {local_datacurso_ratings}
@@ -119,7 +118,7 @@ class service {
                 'categoryid' => $catid,
                 'course_satisfaction' => $satisfaction,
                 'category_preference_pct' => $catpercent,
-                'score' => round($score, 2)
+                'score' => round($score, 2),
             ];
         }
 

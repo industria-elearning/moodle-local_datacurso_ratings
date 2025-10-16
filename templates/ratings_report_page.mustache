@@ -92,9 +92,9 @@
     <!-- Category filter con datalist -->
     <div class="col-md-3">
         <input list="categories" class="form-control" id="category-filter" 
-               placeholder="Buscar categoría..." data-category-id="">
+               placeholder="{{#str}} searchcategories, local_datacurso_ratings {{/str}}" data-category-id="">
         <datalist id="categories">
-            <option value="Todas las categorías" data-id="">Todas las categorías</option>
+            <option value="Todas las categorías" data-id="">{{#str}} allcategories, local_datacurso_ratings {{/str}}</option>
             {{#categories}}
             <option value="{{name}}" data-id="{{id}}">{{name}}</option>
             {{/categories}}
@@ -104,9 +104,9 @@
     <!-- Course filter con datalist -->
     <div class="col-md-3">
         <input list="courses" class="form-control" id="course-filter" 
-               placeholder="Buscar curso...">
+               placeholder="{{#str}} searchcourses, local_datacurso_ratings {{/str}}">
         <datalist id="courses">
-            <option value="Todos los cursos">Todos los cursos</option>
+            <option value="Todos los cursos">{{#str}} allcourses, local_datacurso_ratings {{/str}}</option>
         </datalist>
     </div>
 </div>

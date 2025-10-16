@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,15 +12,15 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'local_datacurso_ratings', language 'de'
+ * Plugin strings are defined here.
  *
- * @package    local_datacurso_ratings
- * @category   string
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_datacurso_ratings
+ * @category    string
+ * @copyright   Josue <josue@datacurso.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -28,31 +28,33 @@ defined('MOODLE_INTERNAL') || die();
 $string['actions'] = 'Aktionen';
 $string['activities'] = 'Aktivitäten';
 $string['activity'] = 'Aktivität';
-$string['activityratingsreport'] = 'Bewertungsbericht für Aktivitäten/Ressourcen';
+$string['activityratingsreport'] = 'Aktivitäts-/Ressourcen-Bewertungsbericht';
 $string['addfeedback'] = 'Neues vordefiniertes Feedback oder Antwort';
-$string['allCourses'] = 'Alle Kurse';
-$string['approval'] = 'Zustimmung';
+$string['allcategories'] = 'Alle Kategorien';
+$string['allcourses'] = 'Alle Kurse';
+$string['analysisresult'] = 'KI-Analyseergebnis';
+$string['approval'] = 'Genehmigung';
 $string['avgLength'] = 'Durchschnittliche Länge';
 $string['cancel'] = 'Abbrechen';
 $string['clear'] = 'Löschen';
 $string['comment'] = 'Kommentar';
-$string['commentlabel'] = 'Haben Sie weitere Kommentare?';
+$string['commentlabel'] = 'Haben Sie zusätzliche Kommentare?';
 $string['commentplaceholder'] = 'Schreiben Sie hier Ihren Kommentar... (optional)';
 $string['comments'] = 'Kommentare';
 $string['course'] = 'Kurs';
 $string['currentstats'] = 'Aktuelle Statistiken';
-$string['datacurso_ratings:manage'] = 'Einstellungen für Datacurso-Bewertungen verwalten';
+$string['datacurso_ratings:manage'] = 'Datacurso-Bewertungseinstellungen verwalten';
 $string['datacurso_ratings:rate'] = 'Aktivitäten bewerten';
-$string['datacurso_ratings:viewreports'] = 'Bewertungsberichte anzeigen';
+$string['datacurso_ratings:viewreports'] = 'Aktivitätsbewertungsberichte anzeigen';
 $string['date'] = 'Datum';
 $string['detailedReport'] = 'Detaillierter Bericht';
-$string['dislike'] = 'Nicht gefallen';
-$string['dislikes'] = 'Nicht-Gefallen';
+$string['dislike'] = 'Gefällt mir nicht';
+$string['dislikes'] = 'Gefällt mir nicht';
 $string['enableplugin'] = 'Plugin in Kursen aktivieren';
 $string['enableplugin_desc'] = 'Wenn aktiviert, wird das Plugin automatisch auf alle neuen Kurse angewendet.';
 $string['existingfeedback'] = 'Vorhandenes Feedback';
 $string['exportcsv'] = 'CSV exportieren';
-$string['feedbackdeleted'] = 'Satz erfolgreich gelöscht';
+$string['feedbackdeleted'] = 'Phrase erfolgreich gelöscht';
 $string['feedbacklabel'] = 'Senden Sie uns Ihren Kommentar (optional)';
 $string['feedbackplaceholder'] = 'Beschreiben Sie Ihre Erfahrung...';
 $string['feedbackresponses'] = 'Feedback-Antworten';
@@ -60,20 +62,22 @@ $string['feedbacksaved'] = 'Feedback erfolgreich gespeichert';
 $string['filterplaceholder'] = 'Nach Kurs, Aktivität oder Kommentar filtern...';
 $string['frequentWords'] = 'Häufige Wörter';
 $string['generalsettings'] = 'Allgemeine Einstellungen';
-$string['generatecommentai'] = 'KI-Analysekommentare generieren';
-$string['generatecommentaicourse'] = 'KI-Analyse für Kurs generieren';
-$string['generatecommentaierror'] = 'KI-Analyse konnte nicht generiert werden...';
+$string['generatecommentai'] = 'KI-Analyse-Kommentare generieren';
+$string['generatecommentaicourse'] = 'KI-Kursanalyse generieren';
+$string['generatecommentaierror'] = 'KI nicht generiert.... ';
 $string['generatecommentaiglobal'] = 'Globale KI-Analyse generieren';
-$string['generatecommentaiprocess'] = 'KI-Analyse wird generiert...';
-$string['getStarted'] = 'Loslegen';
-$string['getStartedDescription'] = 'Sobald die Studierenden beginnen, Aktivitäten und Ressourcen zu bewerten, erscheinen ihre Rückmeldungen hier in umfassenden Berichten.';
+$string['generatecommentaiprocess'] = 'KI-Analyse wird generiert.... ';
+$string['getStarted'] = 'Erste Schritte';
+$string['getStartedDescription'] = 'Sobald Studierende Aktivitäten und Ressourcen bewerten, wird ihr Feedback hier in umfassenden Berichten angezeigt.';
 $string['globalReportSummary'] = 'Globale Berichtszusammenfassung';
 $string['globalSatisfaction'] = 'Globale Zufriedenheit';
 $string['like'] = 'Gefällt mir';
 $string['likecomment'] = 'Kommentar (optional)';
-$string['likes'] = 'Gefällt mir-Angaben';
+$string['likes'] = 'Gefällt mir';
 $string['loading'] = 'Wird geladen...';
 $string['managefeedback'] = 'Vordefinierte Antworten verwalten';
+$string['managefeedbackdislike'] = 'Vordefinierte Antworten Gefällt mir nicht 👎';
+$string['managefeedbacklike'] = 'Vordefinierte Antworten Gefällt mir 👍';
 $string['negativeComments'] = 'Negative Kommentare';
 $string['next'] = 'Weiter';
 $string['noComments'] = 'Keine Kommentare';
@@ -85,44 +89,46 @@ $string['noGlobalDataDescription'] = 'Für Aktivitäten in allen Kursen wurden n
 $string['noRatings'] = 'Keine Bewertungen';
 $string['nodata'] = 'Keine Daten im Bericht verfügbar.';
 $string['nofeedback'] = 'Es wurde noch kein Feedback hinzugefügt';
-$string['nostatsavailable'] = 'Noch keine Statistiken verfügbar. Bewertungen erscheinen hier, sobald Studierende beginnen, Aktivitäten zu bewerten.';
+$string['nostatsavailable'] = 'Noch keine Statistiken verfügbar. Bewertungen werden hier angezeigt, sobald Studierende Aktivitäten bewerten.';
 $string['of'] = 'von';
 $string['pages'] = 'Seiten';
-$string['pluginname'] = 'Datacurso Bewertungen';
+$string['pluginname'] = 'Ranking Aktivitäten KI';
 $string['positiveComments'] = 'Positive Kommentare';
 $string['previous'] = 'Zurück';
 $string['print'] = 'Drucken';
 $string['privacy:metadata:local_datacurso_ratings'] = 'Speichert Benutzerbewertungen für Kursmodule.';
-$string['privacy:metadata:local_datacurso_ratings:cmid'] = 'Das bewertete Kursmodul.';
-$string['privacy:metadata:local_datacurso_ratings:feedback'] = 'Optionaler Feedback-Text, der mit der Bewertung bereitgestellt wurde.';
+$string['privacy:metadata:local_datacurso_ratings:cmid'] = 'Das zu bewertende Kursmodul.';
+$string['privacy:metadata:local_datacurso_ratings:feedback'] = 'Optionaler Feedback-Text, der mit der Bewertung bereitgestellt wird.';
 $string['privacy:metadata:local_datacurso_ratings:rating'] = 'Der Bewertungswert (0 = negativ, 1 = positiv).';
-$string['privacy:metadata:local_datacurso_ratings:timecreated'] = 'Zeitpunkt, zu dem die Bewertung erstellt wurde.';
-$string['privacy:metadata:local_datacurso_ratings:timemodified'] = 'Zeitpunkt, zu dem die Bewertung zuletzt geändert wurde.';
+$string['privacy:metadata:local_datacurso_ratings:timecreated'] = 'Die Zeit, zu der die Bewertung erstellt wurde.';
+$string['privacy:metadata:local_datacurso_ratings:timemodified'] = 'Die Zeit, zu der die Bewertung zuletzt geändert wurde.';
 $string['privacy:metadata:local_datacurso_ratings:userid'] = 'Die ID des Benutzers, der die Bewertung erstellt hat.';
 $string['rateactivity'] = 'Diese Aktivität bewerten';
 $string['ratedActivities'] = 'Bewertete Aktivitäten';
-$string['ratedthanks'] = 'Danke für Ihre Bewertung!';
+$string['ratedthanks'] = 'Vielen Dank für Ihre Bewertung!';
 $string['rating'] = 'Bewertung';
 $string['ratingsaved'] = 'Bewertung erfolgreich gespeichert!';
 $string['ratingsreport'] = 'Allgemeiner Bewertungsbericht';
 $string['ratingsreporttitle'] = 'Bewertungsbericht';
 $string['refresh'] = 'Aktualisieren';
 $string['reportSummary'] = 'Berichtszusammenfassung';
-$string['reports'] = 'Berichte & Statistiken';
-$string['reports_desc'] = 'Bewertungsstatistiken und -berichte anzeigen';
+$string['reports'] = 'Berichte und Statistiken';
+$string['reports_desc'] = 'Bewertungsstatistiken und Berichte anzeigen';
 $string['satisfaction'] = 'Zufriedenheitsrate';
 $string['savefeedback'] = 'Feedback speichern';
 $string['searchActivities'] = 'Aktivitäten suchen...';
 $string['searchInComments'] = 'In Kommentaren suchen';
+$string['searchcategories'] = 'Kategorien suchen';
+$string['searchcourses'] = 'Kurse suchen';
 $string['send'] = 'Senden';
 $string['settingstitle'] = 'Allgemeine Einstellungen';
 $string['showing'] = 'Seite anzeigen';
-$string['studentFeedback'] = 'Studentenfeedback';
-$string['total'] = 'Gesamt';
-$string['totalActivities'] = 'Gesamtanzahl der Aktivitäten';
-$string['totalComments'] = 'Gesamtanzahl der Kommentare';
-$string['totalCourses'] = 'Gesamtanzahl der Kurse';
-$string['totalRatings'] = 'Gesamtanzahl der Bewertungen';
+$string['studentFeedback'] = 'Studierenden-Feedback';
+$string['total'] = 'gesamt';
+$string['totalActivities'] = 'Aktivitäten insgesamt';
+$string['totalComments'] = 'Kommentare insgesamt';
+$string['totalCourses'] = 'Kurse insgesamt';
+$string['totalRatings'] = 'Bewertungen insgesamt';
 $string['type'] = 'Typ';
 $string['viewActivity'] = 'Aktivität anzeigen';
 $string['viewComments'] = 'Kommentare anzeigen';

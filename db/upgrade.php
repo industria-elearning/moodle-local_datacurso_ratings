@@ -33,7 +33,7 @@ function xmldb_local_datacurso_ratings_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2025091000) {
+    if ($oldversion < 2025101500) {
         // Define table local_datacurso_ratings_feedback to be created.
         $table = new xmldb_table('local_datacurso_ratings_feedback');
 
@@ -49,7 +49,18 @@ function xmldb_local_datacurso_ratings_upgrade($oldversion) {
         }
 
         // Savepoint after table creation.
-        upgrade_plugin_savepoint(true, 2025091000, 'local', 'datacurso_ratings');
+        upgrade_plugin_savepoint(true, 2025101500, 'local', 'datacurso_ratings');
+    }
+
+    if ($oldversion < 2025101504) {
+        $table = new xmldb_table('local_datacurso_ratings_feedback');
+        $field = new xmldb_field('type', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'like');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field);
+        } else {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2025101504, 'local', 'datacurso_ratings');
     }
 
     // New upgrade step: Add courseid and categoryid fields to the ratings table.

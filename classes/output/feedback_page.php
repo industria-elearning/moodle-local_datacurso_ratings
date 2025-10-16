@@ -18,7 +18,7 @@
  * Class feedback_page.
  *
  * @package    local_datacurso_ratings
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,23 +31,29 @@ use stdClass;
 
 /**
  * Feedback page class for rendering ratings feedback.
- *
- * @package    local_datacurso_ratings
  */
 class feedback_page implements renderable, templatable {
-
-    /**
-     * @var array Feedback items.
-     */
+    /** @var array Feedback items. */
     private $items;
+
+    /** @var string Type of feedback (like/dislike). */
+    private $type;
 
     /**
      * Constructor.
+     *
+     * @param string $type Tipo de feedback a mostrar (like o dislike)
      */
-    public function __construct() {
+    public function __construct(string $type) {
         global $DB;
-        $records = $DB->get_records('local_datacurso_ratings_feedback', null, 'id DESC');
-        $this->items = array_values($records);
+        $this->type = $type;
+
+        // Filtrar directamente desde la base de datos.
+        $this->items = $DB->get_records(
+            'local_datacurso_ratings_feedback',
+            ['type' => $this->type],
+            'id DESC'
+        );
     }
 
     /**
@@ -61,12 +67,13 @@ class feedback_page implements renderable, templatable {
         foreach ($this->items as $rec) {
             $items[] = [
                 'id' => $rec->id,
-                'feedbacktext' => $rec->feedbacktext,
+                'feedbacktext' => format_text($rec->feedbacktext, FORMAT_PLAIN),
             ];
         }
 
         return [
             'items' => $items,
+            'type' => $this->type,
             'sesskey' => sesskey(),
         ];
     }

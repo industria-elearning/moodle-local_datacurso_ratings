@@ -34,7 +34,6 @@ use core_privacy\local\request\writer;
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\plugin\provider {
-
     /**
      * Describe the types of personal data stored by this plugin.
      *
@@ -164,7 +163,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
         $userids = $userlist->get_userids();
         if (!empty($userids)) {
-            list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
             $DB->delete_records_select('local_datacurso_ratings', "userid $insql", $params);
         }
     }

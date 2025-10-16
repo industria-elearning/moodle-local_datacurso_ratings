@@ -36,7 +36,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_rating extends external_api {
-
     /**
      * Define the expected parameters for the service.
      *

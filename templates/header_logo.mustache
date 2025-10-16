@@ -26,7 +26,14 @@
 
 <div class="datacurso-header d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
     <h2 class="m-0">{{#str}} ratingsreport, local_datacurso_ratings {{/str}}</h2>
-    <a href="https://datacurso.com/" target="_blank" rel="noopener noreferrer" class="d-flex align-items-center">
-        <img src="{{logourl}}" alt="Logo Datacurso" style="height:32px;">
-    </a>
+    {{#logourl}}
+        <a href="https://datacurso.com/" target="_blank" rel="noopener noreferrer" class="d-flex align-items-center">
+            <img src="{{logourl}}" alt="Logo Datacurso" style="height:32px;">
+        </a>
+    {{/logourl}}
+    {{^logourl}}
+        <a href="https://datacurso.com/" target="_blank" rel="noopener noreferrer" class="d-flex align-items-center">
+            <img src="{{config.wwwroot}}/pix/moodlelogo.png" alt="Logo Moodle" style="height:32px;">
+        </a>
+    {{/logourl}}
 </div>

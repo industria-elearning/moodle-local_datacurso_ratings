@@ -35,7 +35,6 @@ use aiprovider_datacurso\httpclient\ai_services_api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_ai_analysis_global extends external_api {
-
     /**
      * No params required.
      */

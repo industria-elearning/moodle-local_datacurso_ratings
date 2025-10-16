@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module get_ai_analysis_course
+ * AI Analysis for Courses Module.
  *
  * @module     local_datacurso_ratings/get_ai_analysis_course
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
@@ -24,33 +24,38 @@
 /* eslint-disable */
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
+import {get_string as getString} from 'core/str';
 
 export const init = (courseid) => {
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', async function(e) {
         if (e.target.classList.contains('btn-generate-ai-course') || e.target.closest('.btn-generate-ai-course')) {
             e.preventDefault();
-
-            console.log(courseid)
 
             const button = e.target.closest('.btn-generate-ai-course');
             const resultContainer = document.querySelector('.ai-analysis-result-course');
 
             if (!courseid || !resultContainer) {
-                console.warn('No se encontró courseid o contenedor para resultado');
+                const missingData = 'No there id course';
+                console.warn(missingData);
                 return;
             }
 
+            const generatingText = await getString('generatecommentaiprocess', 'local_datacurso_ratings');
+
             resultContainer.innerHTML = `<div class="text-muted">
-                <i class="fa fa-spinner fa-spin"></i> Generando análisis del curso...
+                <i class="fa fa-spinner fa-spin"></i> ${generatingText}
             </div>`;
 
             Ajax.call([{
                 methodname: 'local_datacurso_ratings_get_ai_analysis_course',
                 args: { courseid: parseInt(courseid, 10) }
             }])[0]
-            .then(data => {
+            .then(async data => {
+                const analysisTitle = await getString('analysisresult', 'local_datacurso_ratings');
+
                 resultContainer.innerHTML = `
                     <div class="alert alert-info p-2 mb-2">
+                        <strong>${analysisTitle}</strong><br>
                         ${data.ai_analysis_course}
                     </div>`;
             })

@@ -24,13 +24,11 @@
     }
 }}
 
-<div class="feedback-admin">
-
-    <h4>Datacurso Ratings</h4>
+<div class="feedback-admin" data-type="{{type}}">
 
     <form class="feedback-form d-flex gap-5 mb-3">
-        <input type="text" name="feedbacktext" class="form-control mr-2" placeholder="Agrega una respuesta preestablecida" required>
-        <button type="submit" class="btn btn-primary">Agregar</button>
+        <input type="text" name="feedbacktext" class="form-control mr-2" placeholder="{{#str}} add, core {{/str}}" required>
+        <button type="submit" class="btn btn-primary">{{#str}} add, core {{/str}}</button>
     </form>
 
     <ul class="feedback-list list-group">
@@ -42,7 +40,7 @@
         {{/items}}
 
         {{^items}}
-            <li class="list-group-item text-muted">No hay frases registradas aún.</li>
+            <li class="list-group-item text-muted">{{#str}} nodata, local_datacurso_ratings {{/str}}</li>
         {{/items}}
     </ul>
 </div>

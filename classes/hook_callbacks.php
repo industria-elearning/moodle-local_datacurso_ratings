@@ -28,7 +28,6 @@ use context_module;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class hook_callbacks {
-
     /**
      * Inject the rating UI just before the footer is generated.
      *
@@ -70,9 +69,9 @@ class hook_callbacks {
 
         // List of pages where the rating must not appear.
         $excludedpages = [
-            'modedit.php',      // Edition of activity.
-            'edit.php',         // General configuration.
-            'mod_form.php',     // Module form.
+            'modedit.php',
+            'edit.php',
+            'mod_form.php',
         ];
 
         if (in_array($script, $excludedpages)) {
@@ -94,18 +93,16 @@ class hook_callbacks {
         }
 
         // Export data for the template.
-        $feedbackpage = new \local_datacurso_ratings\output\feedback_page();
-        $feedbackdata = $feedbackpage->export_for_template($OUTPUT);
+        $feedbackpagelike = new \local_datacurso_ratings\output\feedback_page('like');
+        $feedbackpagedislike = new \local_datacurso_ratings\output\feedback_page('dislike');
+        $feedbackdatalike = $feedbackpagelike->export_for_template($OUTPUT);
+        $feedbackdatadislike = $feedbackpagedislike->export_for_template($OUTPUT);
 
         // Render the Mustache template with the buttons.
         $html = $OUTPUT->render_from_template('local_datacurso_ratings/rate_button', [
             'cmid' => $cm->id,
-            'likeItems' => [
-                ['feedbacktext' => 'Very useful'],
-                ['feedbacktext' => 'Well explained'],
-                ['feedbacktext' => 'Interesting'],
-            ],
-            'dislikeItems' => $feedbackdata['items'],
+            'likeItems' => $feedbackdatalike['items'],
+            'dislikeItems' => $feedbackdatadislike['items'],
         ]);
 
         // Inject the HTML before the footer.

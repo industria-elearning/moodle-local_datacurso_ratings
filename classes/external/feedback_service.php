@@ -32,7 +32,6 @@ use context_system;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedback_service extends external_api {
-
     /**
      * Define input parameters for add_feedback.
      *
@@ -41,6 +40,7 @@ class feedback_service extends external_api {
     public static function add_feedback_parameters() {
         return new external_function_parameters([
             'feedbacktext' => new external_value(PARAM_TEXT, 'Feedback text', VALUE_REQUIRED),
+            'type' => new external_value(PARAM_ALPHA, 'Feedback type (like or dislike)', VALUE_REQUIRED),
         ]);
     }
 
@@ -52,19 +52,22 @@ class feedback_service extends external_api {
      *  - int id: ID of the created feedback
      *  - string message: Confirmation message
      */
-    public static function add_feedback($feedbacktext) {
+    public static function add_feedback($feedbacktext, $type) {
         global $DB;
 
         self::validate_context(context_system::instance());
-        $params = self::validate_parameters(self::add_feedback_parameters(), ['feedbacktext' => $feedbacktext]);
+        $params = self::validate_parameters(
+            self::add_feedback_parameters(),
+            ['feedbacktext' => $feedbacktext, 'type' => $type]
+        );
 
         $record = (object)[
             'feedbacktext' => $params['feedbacktext'],
+            'type' => $params['type'],
             'timecreated' => time(),
             'timemodified' => time(),
         ];
         $id = $DB->insert_record('local_datacurso_ratings_feedback', $record);
-
         return ['id' => $id, 'message' => get_string('feedbacksaved', 'local_datacurso_ratings')];
     }
 
