@@ -48,6 +48,7 @@ class feedback_service extends external_api {
      * Add a feedback.
      *
      * @param string $feedbacktext Feedback text
+     * @param string $type Feedback type (like or dislike)
      * @return array Array with:
      *  - int id: ID of the created feedback
      *  - string message: Confirmation message

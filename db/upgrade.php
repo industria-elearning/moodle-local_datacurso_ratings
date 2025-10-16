@@ -33,6 +33,37 @@ function xmldb_local_datacurso_ratings_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    // Upgrade step: Add courseid and categoryid fields to the ratings table.
+    if ($oldversion < 2025100100) {
+        $table = new xmldb_table('local_datacurso_ratings');
+
+        // Add courseid field.
+        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'cmid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add categoryid field.
+        $field = new xmldb_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'courseid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add indexes to improve query performance.
+        $index1 = new xmldb_index('courseid_idx', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+        if (!$dbman->index_exists($table, $index1)) {
+            $dbman->add_index($table, $index1);
+        }
+
+        $index2 = new xmldb_index('categoryid_idx', XMLDB_INDEX_NOTUNIQUE, ['categoryid']);
+        if (!$dbman->index_exists($table, $index2)) {
+            $dbman->add_index($table, $index2);
+        }
+
+        // Savepoint after structure modification.
+        upgrade_plugin_savepoint(true, 2025100100, 'local', 'datacurso_ratings');
+    }
+
     if ($oldversion < 2025101500) {
         // Define table local_datacurso_ratings_feedback to be created.
         $table = new xmldb_table('local_datacurso_ratings_feedback');
@@ -61,38 +92,6 @@ function xmldb_local_datacurso_ratings_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
         upgrade_plugin_savepoint(true, 2025101504, 'local', 'datacurso_ratings');
-    }
-
-    // New upgrade step: Add courseid and categoryid fields to the ratings table.
-    if ($oldversion < 2025100100) {
-
-        $table = new xmldb_table('local_datacurso_ratings');
-
-        // Add courseid field.
-        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'cmid');
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Add categoryid field.
-        $field = new xmldb_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'courseid');
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Add indexes to improve query performance.
-        $index1 = new xmldb_index('courseid_idx', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
-        if (!$dbman->index_exists($table, $index1)) {
-            $dbman->add_index($table, $index1);
-        }
-
-        $index2 = new xmldb_index('categoryid_idx', XMLDB_INDEX_NOTUNIQUE, ['categoryid']);
-        if (!$dbman->index_exists($table, $index2)) {
-            $dbman->add_index($table, $index2);
-        }
-
-        // Savepoint after structure modification.
-        upgrade_plugin_savepoint(true, 2025100100, 'local', 'datacurso_ratings');
     }
 
     return true;
