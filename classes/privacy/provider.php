@@ -41,8 +41,6 @@ class provider implements
      * @return collection
      */
     public static function get_metadata(collection $collection): collection {
-
-        // Tabla principal de calificaciones.
         $collection->add_database_table(
             'local_datacurso_ratings',
             [
@@ -58,7 +56,6 @@ class provider implements
             'privacy:metadata:local_datacurso_ratings'
         );
 
-        // Tabla de feedbacks generales (no vinculada directamente a usuarios).
         $collection->add_database_table(
             'local_datacurso_ratings_feedback',
             [
