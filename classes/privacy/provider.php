@@ -26,14 +26,15 @@ use core_privacy\local\request\writer;
 /**
  * Privacy Subsystem implementation for local_datacurso_ratings.
  *
- * This plugin stores user ratings linked to course modules.
- *
  * @package   local_datacurso_ratings
  * @category  privacy
- * @copyright 2025
+ * @copyright 2025 Industria Elearning <info@industriaelearning.com>
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\plugin\provider {
+class provider implements
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\plugin\provider {
+
     /**
      * Describe the types of personal data stored by this plugin.
      *
@@ -41,17 +42,33 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * @return collection
      */
     public static function get_metadata(collection $collection): collection {
+
+        // Tabla principal de calificaciones.
         $collection->add_database_table(
             'local_datacurso_ratings',
             [
                 'userid'       => 'privacy:metadata:local_datacurso_ratings:userid',
                 'cmid'         => 'privacy:metadata:local_datacurso_ratings:cmid',
+                'courseid'     => 'privacy:metadata:local_datacurso_ratings:courseid',
+                'categoryid'   => 'privacy:metadata:local_datacurso_ratings:categoryid',
                 'rating'       => 'privacy:metadata:local_datacurso_ratings:rating',
                 'feedback'     => 'privacy:metadata:local_datacurso_ratings:feedback',
                 'timecreated'  => 'privacy:metadata:local_datacurso_ratings:timecreated',
                 'timemodified' => 'privacy:metadata:local_datacurso_ratings:timemodified',
             ],
-            'privacy:metadata:local_datacurso_ratings',
+            'privacy:metadata:local_datacurso_ratings'
+        );
+
+        // Tabla de feedbacks generales (no vinculada directamente a usuarios).
+        $collection->add_database_table(
+            'local_datacurso_ratings_feedback',
+            [
+                'feedbacktext' => 'privacy:metadata:local_datacurso_ratings_feedback:feedbacktext',
+                'type'         => 'privacy:metadata:local_datacurso_ratings_feedback:type',
+                'timecreated'  => 'privacy:metadata:local_datacurso_ratings_feedback:timecreated',
+                'timemodified' => 'privacy:metadata:local_datacurso_ratings_feedback:timemodified',
+            ],
+            'privacy:metadata:local_datacurso_ratings_feedback'
         );
 
         return $collection;
@@ -92,13 +109,13 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         }
 
         $userid = $contextlist->get_user()->id;
-        $records = $DB->get_records('local_datacurso_ratings', ['userid' => $userid]);
+        $ratings = $DB->get_records('local_datacurso_ratings', ['userid' => $userid]);
 
-        if (!empty($records)) {
+        if (!empty($ratings)) {
             foreach ($contextlist as $context) {
                 writer::with_context($context)->export_data(
                     ['Ratings'],
-                    (object)['entries' => $records]
+                    (object)['entries' => array_values($ratings)]
                 );
             }
         }
@@ -114,8 +131,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             return;
         }
 
-        $sql = "SELECT userid
-                  FROM {local_datacurso_ratings}";
+        $sql = "SELECT userid FROM {local_datacurso_ratings}";
         $userlist->add_from_sql('userid', $sql, []);
     }
 
@@ -129,6 +145,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
         if ($context->contextlevel == CONTEXT_SYSTEM) {
             $DB->delete_records('local_datacurso_ratings');
+            $DB->delete_records('local_datacurso_ratings_feedback');
         }
     }
 

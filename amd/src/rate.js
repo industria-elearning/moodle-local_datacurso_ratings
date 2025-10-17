@@ -14,17 +14,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module rate
+ * Handles rating and feedback interactions for course modules.
  *
  * @module     local_datacurso_ratings/rate
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /* eslint-disable */
 import Ajax from 'core/ajax';
-import Notification from 'core/notification';
-import {get_string as getString} from 'core/str';
+import { get_string as getString } from 'core/str';
 
 /**
  * Initialise rating widget for the given cmid.
@@ -43,45 +42,63 @@ export const init = (cmid) => {
     const cancelBtn = container.querySelector('[data-action="cancel"]');
     const likeOptions = container.querySelector('.like-options');
     const dislikeOptions = container.querySelector('.dislike-options');
+    const msgResponse = container.querySelector('.message-response-rate');
 
-    const show = el => { 
-        if (el) { 
-            el.style.display = 'block'; 
-            el.setAttribute('aria-hidden', 'false'); 
-        } 
-    };
-    const hide = el => { 
-        if (el) { 
-            el.style.display = 'none'; 
-            el.setAttribute('aria-hidden', 'true'); 
-        } 
+    const show = el => {
+        if (el) {
+            el.style.display = 'block';
+            el.setAttribute('aria-hidden', 'false');
+        }
     };
 
-    // Events of rate 👍 y 👎
+    const hide = el => {
+        if (el) {
+            el.style.display = 'none';
+            el.setAttribute('aria-hidden', 'true');
+        }
+    };
+
+    /**
+     * Display a feedback message inside the message-response-rate div.
+     * @param {String} message The message text.
+     * @param {String} type "success" or "error".
+     */
+    const showMessage = (message, type = 'success') => {
+        if (!msgResponse) {
+            return;
+        }
+
+        msgResponse.innerHTML = `
+            <div class="alert alert-${type === 'success' ? 'success' : 'danger'}" role="alert" style="margin-top:0.5rem;">
+                ${message}
+            </div>
+        `;
+    };
+
+    // Events for rate 👍 and 👎.
     container.querySelectorAll('[data-action="rate"]').forEach(btn => {
         btn.addEventListener('click', () => {
             const rating = parseInt(btn.dataset.rating, 10);
-            
+
             if (rating === 0) {
-                // Dislike → show dislike options
+                // Dislike → show dislike options.
                 show(fbBlock);
                 show(dislikeOptions);
                 hide(likeOptions);
                 sendBtn?.setAttribute('data-rating', '0');
             } else {
-                // Like → show like options
+                // Like → show like options.
                 show(fbBlock);
                 show(likeOptions);
                 hide(dislikeOptions);
                 sendBtn?.setAttribute('data-rating', '1');
             }
-            
-            // Hide textarea to change rating
+
             hide(fbTextareaWrap);
         });
     });
 
-    // Show textarea especific if "Others"
+    // Show textarea if "Others".
     container.querySelectorAll('input[name="feedback_choice"]').forEach(radio => {
         radio.addEventListener('change', () => {
             if (radio.value === 'other' && radio.checked) {
@@ -93,63 +110,64 @@ export const init = (cmid) => {
         });
     });
 
-    // Cancelate feedback
+    // Cancel feedback.
     cancelBtn?.addEventListener('click', () => {
         hide(fbBlock);
         hide(fbTextareaWrap);
-        
-        // Clean all fields
         if (fbInput) fbInput.value = '';
-        
-        // Discheck in options
+
         container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.checked = false);
-        
         sendBtn?.removeAttribute('data-rating');
+        msgResponse.innerHTML = ''; // Clean previous message.
     });
 
-    // Send feedback
+    // Send feedback.
     sendBtn?.addEventListener('click', () => {
         const rating = parseInt(sendBtn.getAttribute('data-rating') || '0', 10);
         const selected = container.querySelector('input[name="feedback_choice"]:checked');
 
         let feedback = '';
-        
-        // (like y dislike)
         if (selected) {
-            if (selected.value === 'other') {
-                feedback = (fbInput?.value || '').trim();
-            } else {
-                feedback = selected.value;
-            }
+            feedback = selected.value === 'other' ? (fbInput?.value || '').trim() : selected.value;
         }
 
         sendRating(cmid, rating, feedback);
     });
 
+    /**
+     * Send rating to server via Ajax.
+     * @param {Number} cmid
+     * @param {Number} rating
+     * @param {String} feedback
+     */
     function sendRating(cmid, rating, feedback) {
         Ajax.call([{
             methodname: 'local_datacurso_ratings_save_rating',
-            args: {cmid, rating, feedback}
+            args: { cmid, rating, feedback }
         }])[0]
-        .then(async() => {
-            const saved = await getString('ratingsaved', 'local_datacurso_ratings');
-            Notification.addNotification({message: saved, type: 'success'});
+            .then(async () => {
+                const saved = await getString('ratingsaved', 'local_datacurso_ratings');
+                showMessage(saved, 'success');
 
-            // Disabled buttons after of send
-            if (container) {
-                container.querySelectorAll('[data-action="rate"]').forEach(btn => btn.disabled = true);
-                container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.disabled = true);
-                if (sendBtn) sendBtn.disabled = true;
-                if (cancelBtn) cancelBtn.disabled = true;
-                if (fbInput) fbInput.disabled = true;
-            }
+                // Disable inputs after sending.
+                if (container) {
+                    container.querySelectorAll('[data-action="rate"]').forEach(btn => btn.disabled = true);
+                    container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.disabled = true);
+                    if (sendBtn) sendBtn.disabled = true;
+                    if (cancelBtn) cancelBtn.disabled = true;
+                    if (fbInput) fbInput.disabled = true;
+                }
 
-            // Hide blocks of feedback
-            hide(fbBlock);
-            hide(fbTextareaWrap);
-        })
-        .catch(Notification.exception);
+                hide(fbBlock);
+                hide(fbTextareaWrap);
+                console.log("save")
+            })
+            .catch(async (error) => {
+                console.error(error);
+                const errMsg = await getString('errorrating', 'local_datacurso_ratings');
+                showMessage(errMsg, 'error');
+            });
     }
 };
 
-export default {init};
+export default { init };
