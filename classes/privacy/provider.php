@@ -123,14 +123,19 @@ class provider implements
      * @param userlist $userlist The userlist to add the users to.
      */
     public static function get_users_in_context(userlist $userlist) {
-        if ($userlist->get_context()->contextlevel != CONTEXT_SYSTEM) {
+        global $DB;
+
+        $context = $userlist->get_context();
+
+        // Aceptar tanto el contexto del sistema como el de usuario.
+        if (!in_array($context->contextlevel, [CONTEXT_SYSTEM, CONTEXT_USER])) {
             return;
         }
 
         $sql = "SELECT userid FROM {local_datacurso_ratings}";
         $userlist->add_from_sql('userid', $sql, []);
     }
-
+    
     /**
      * Delete all data for all users in the specified context.
      *
