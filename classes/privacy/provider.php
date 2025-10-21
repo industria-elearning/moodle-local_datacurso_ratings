@@ -135,7 +135,7 @@ class provider implements
         $sql = "SELECT userid FROM {local_datacurso_ratings}";
         $userlist->add_from_sql('userid', $sql, []);
     }
-    
+
     /**
      * Delete all data for all users in the specified context.
      *

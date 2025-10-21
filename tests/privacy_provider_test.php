@@ -34,7 +34,6 @@ use core_privacy\tests\provider_testcase;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class privacy_provider_test extends provider_testcase {
-
     /**
      * Test that metadata is correctly defined by the provider.
      *
