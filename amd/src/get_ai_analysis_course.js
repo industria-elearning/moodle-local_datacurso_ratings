@@ -59,7 +59,12 @@ export const init = (courseid) => {
                         ${data.ai_analysis_course}
                     </div>`;
             })
-            .catch(Notification.exception);
+            .catch((e)=> {
+                resultContainer.innerHTML = `
+                    <div class="alert alert-danger p-2 mb-2">
+                        <i class="fa fa-exclamation-triangle"></i> ${e.message}
+                    </div>`;
+            });
         }
     });
 };
