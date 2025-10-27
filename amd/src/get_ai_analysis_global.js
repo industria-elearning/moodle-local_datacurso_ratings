@@ -24,7 +24,7 @@
 /* eslint-disable */
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
-import {get_string as getString} from 'core/str';
+import { get_string as getString } from 'core/str';
 
 export const init = () => {
     document.addEventListener('click', async (e) => {
@@ -50,23 +50,28 @@ export const init = () => {
             methodname: 'local_datacurso_ratings_get_ai_analysis_global',
             args: {},
         }])[0]
-        .done((response) => {
-            if (response && response.analysis) {
-                resultContainer.innerHTML = `
+            .done((response) => {
+                if (response && response.analysis) {
+                    resultContainer.innerHTML = `
                     <div class="alert alert-info">
                         <h6>${analysisTitle}</h6>
                         <p>${response.analysis}</p>
                     </div>`;
-            } else {
-                resultContainer.innerHTML = `<div class="alert alert-warning">${generateError}</div>`;
-            }
-        })
-        .fail(Notification.exception)
-        .always(() => {
-            button.disabled = false;
-            button.innerHTML = `${generateButton} ✨`;
-        });
+                } else {
+                    resultContainer.innerHTML = `<div class="alert alert-warning">${generateError}</div>`;
+                }
+            })
+            .fail((e) => {
+                resultContainer.innerHTML = `
+                    <div class="alert alert-danger p-2 mb-2">
+                        <i class="fa fa-exclamation-triangle"></i> ${e.message}
+                    </div>`;
+            })
+            .always(() => {
+                button.disabled = false;
+                button.innerHTML = `${generateButton} ✨`;
+            });
     });
 };
 
-export default {init};
+export default { init };
