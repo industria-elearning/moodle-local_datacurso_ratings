@@ -14,22 +14,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module ratings_report_course
+ * Displays and manages the AI-powered ratings report for a course.
  *
  * @module     local_datacurso_ratings/ratings_report_course
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* eslint-disable */
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
 import Notification from 'core/notification';
-import { get_string as getString } from 'core/str';
 
 /**
- * Initialize the ratings report for a course
- * @param {Number} courseid
+ * Initialize the ratings report for a specific course.
+ *
+ * @param {number} courseid
  */
 export const init = (courseid) => {
     const container = document.querySelector('#ratings-report-container');
@@ -37,62 +36,67 @@ export const init = (courseid) => {
         return;
     }
 
-    // Show loading state
     showLoading(container);
 
-    // Call the web service
     Ajax.call([{
         methodname: 'local_datacurso_ratings_get_ratings_report_course',
-        args: { courseid: courseid }
+        args: {courseid}
     }])[0]
-        .then((data) => {
-            return processReportData(data, courseid);
-        })
-        .then((templateData) => {
-            return Templates.render('local_datacurso_ratings/report_ratings_course', templateData);
-        })
+        .then((data) => processReportData(data, courseid))
+        .then((templateData) => Templates.render('local_datacurso_ratings/report_ratings_course', templateData))
         .then((html, js) => {
-            // Replace loading with actual content
             container.innerHTML = html;
             Templates.runTemplateJS(js);
-
-            // Initialize any additional functionality
             initTableFeatures();
         })
         .catch((error) => {
-            console.error('Error loading ratings report:', error);
-            showError(container, error);
+            Notification.exception(error);
         });
 };
 
 /**
- * Process the raw data from web service
- * @param {Array} data Raw data from web service
- * @param {Number} courseid Course ID
- * @returns {Object} Processed data for template
+ * Process raw report data into a template-friendly format.
+ *
+ * @param {Array} data - Raw WS data.
+ * @param {number} courseid - Course ID.
+ * @returns {Object}
  */
 function processReportData(data, courseid) {
-    // Calculate totals
     let totalLikes = 0;
     let totalDislikes = 0;
     let activitiesWithRatings = 0;
 
-    const processedActivities = data.map(activity => {
-        totalLikes += activity.likes;
-        totalDislikes += activity.dislikes;
+    const processedActivities = data.map((item) => {
+        const likes = item.likes || 0;
+        const dislikes = item.dislikes || 0;
+        const totalRatings = likes + dislikes;
 
-        if (activity.likes + activity.dislikes > 0) {
+        totalLikes += likes;
+        totalDislikes += dislikes;
+        if (totalRatings > 0) {
             activitiesWithRatings++;
         }
 
+        const porcentaje = item.approvalpercent || 0;
+        const comentariosArray = Array.isArray(item.comments) ? item.comments : [];
+        const comentarios = comentariosArray.join(' / ');
+
         return {
-            ...activity,
-            total_ratings: activity.likes + activity.dislikes,
-            has_ratings: (activity.likes + activity.dislikes) > 0,
-            has_comments: activity.comentarios && activity.comentarios.trim() !== '',
-            satisfaction_class: getSatisfactionClass(activity.porcentaje),
-            formatted_percentage: activity.porcentaje ? activity.porcentaje.toFixed(1) + '%' : '0%',
-            activityurl: M.cfg.wwwroot + '/mod/' + activity.modulo + '/view.php?id=' + activity.cmid
+            curso: item.course || '',
+            actividad: item.activity || '',
+            modulo: item.modname || '',
+            cmid: item.cmid || 0,
+            url: item.url || '',
+            likes,
+            dislikes,
+            porcentaje,
+            comentarios,
+            total_ratings: totalRatings,
+            has_ratings: totalRatings > 0,
+            has_comments: comentariosArray.length > 0,
+            satisfaction_class: getSatisfactionClass(porcentaje),
+            formatted_percentage: `${porcentaje.toFixed(1)}%`,
+            activityurl: item.url || `${M.cfg.wwwroot}/mod/${item.modname}/view.php?id=${item.cmid}`
         };
     });
 
@@ -100,7 +104,7 @@ function processReportData(data, courseid) {
     const overallSatisfaction = totalRatings > 0 ? ((totalLikes / totalRatings) * 100) : 0;
 
     return {
-        courseid: courseid,
+        courseid,
         activities: processedActivities,
         has_data: processedActivities.length > 0,
         summary: {
@@ -116,92 +120,95 @@ function processReportData(data, courseid) {
 }
 
 /**
- * Get CSS class based on satisfaction percentage
- * @param {Number} percentage
- * @returns {String}
+ * Get Bootstrap color class based on satisfaction percentage.
+ *
+ * @param {number} percentage
+ * @returns {string}
  */
 function getSatisfactionClass(percentage) {
-    if (percentage >= 80) return 'success';
-    if (percentage >= 60) return 'warning';
+    if (percentage >= 80) {
+        return 'success';
+    }
+    if (percentage >= 60) {
+        return 'warning';
+    }
     return 'danger';
 }
 
 /**
- * Show loading state
- * @param {Element} container
+ * Display a loading spinner.
+ *
+ * @param {HTMLElement} container
  */
-function showLoading(container) {
-    container.innerHTML = `
-        <div class="text-center p-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-            <p class="mt-2">Cargando reporte de calificaciones...</p>
-        </div>
-    `;
+export async function showLoading(container) {
+    const html = await Templates.render('local_datacurso_ratings/report_ratings_loading', {});
+    container.innerHTML = html;
 }
 
-/**
- * Show error message
- * @param {Element} container
- * @param {Object} error
- */
-function showError(container, error) {
-    container.innerHTML = `
-        <div class="alert alert-danger">
-            <h4>Error al cargar el reporte</h4>
-            <p>No se pudo cargar la información del reporte. Por favor, intente nuevamente.</p>
-            <small>Error: ${error.message || 'Error desconocido'}</small>
-        </div>
-    `;
-}
 
 /**
- * Initialize additional table features (sorting, filtering, etc.)
+ * Initialize interactive features in the rendered table.
  */
 function initTableFeatures() {
-    // Add click handlers for expandable comments
-    document.querySelectorAll('.expand-comments').forEach(button => {
+    document.querySelectorAll('.expand-comments').forEach((button) => {
         button.addEventListener('click', (e) => {
-            const target = e.target.getAttribute('data-target');
-            const commentsDiv = document.querySelector(target);
-
-            if (commentsDiv.style.display === 'none' || !commentsDiv.style.display) {
-                commentsDiv.style.display = 'block';
-                e.target.textContent = 'Ocultar comentarios';
-            } else {
-                commentsDiv.style.display = 'none';
-                e.target.textContent = 'Ver comentarios';
+            const targetSelector = e.currentTarget.getAttribute('data-target');
+            const commentsDiv = document.querySelector(targetSelector);
+            if (!commentsDiv) {
+                return;
             }
+
+            const isHidden = commentsDiv.style.display === 'none' || !commentsDiv.style.display;
+            commentsDiv.style.display = isHidden ? 'block' : 'none';
+            e.currentTarget.textContent = isHidden ? 'Ocultar comentarios' : 'Ver comentarios';
         });
     });
 
-    // Add sorting functionality (optional)
     initTableSorting();
 }
 
 /**
- * Initialize table sorting functionality
+ * Initialize sorting on table headers.
  */
 function initTableSorting() {
     const headers = document.querySelectorAll('th[data-sort]');
-    headers.forEach(header => {
+    headers.forEach((header) => {
         header.style.cursor = 'pointer';
         header.addEventListener('click', () => {
             const sortBy = header.getAttribute('data-sort');
-            sortTable(sortBy);
+            sortTable(sortBy, header);
         });
     });
 }
 
 /**
- * Sort table by column
- * @param {String} column
+ * Basic table sorting handler.
+ *
+ * @param {string} column - The column key to sort by.
+ * @param {HTMLElement} header - The clicked header element.
  */
-function sortTable(column) {
-    // Implementation for table sorting
-    console.log('Sorting by:', column);
-    // You can implement actual sorting logic here if needed
+function sortTable(column, header) {
+    const table = header.closest('table');
+    const tbody = table?.querySelector('tbody');
+    if (!tbody) {
+        return;
+    }
+
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const ascending = !header.classList.contains('sorted-asc');
+
+    table.querySelectorAll('th[data-sort]').forEach((h) => h.classList.remove('sorted-asc', 'sorted-desc'));
+    header.classList.add(ascending ? 'sorted-asc' : 'sorted-desc');
+
+    rows.sort((a, b) => {
+        const aValue = a.dataset[column] || '';
+        const bValue = b.dataset[column] || '';
+        return ascending
+            ? aValue.localeCompare(bValue, undefined, {numeric: true})
+            : bValue.localeCompare(aValue, undefined, {numeric: true});
+    });
+
+    rows.forEach((row) => tbody.appendChild(row));
 }
 
-export default { init };
+export default {init};

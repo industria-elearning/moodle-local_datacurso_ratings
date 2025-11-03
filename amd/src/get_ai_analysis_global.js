@@ -21,13 +21,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* eslint-disable */
 import Ajax from 'core/ajax';
-import Notification from 'core/notification';
-import { get_string as getString } from 'core/str';
+import Templates from 'core/templates';
 
 export const init = () => {
-    document.addEventListener('click', async (e) => {
+    document.addEventListener('click', async(e) => {
         if (!e.target.closest('.btn-generate-ai')) {
             return;
         }
@@ -35,43 +33,40 @@ export const init = () => {
         const button = e.target.closest('.btn-generate-ai');
         const resultContainer = document.querySelector('.ai-analysis-result-global');
 
-        // Get localized strings
-        const generatingText = await getString('generatecommentaiprocess', 'local_datacurso_ratings');
-        const analysisTitle = await getString('analysisresult', 'local_datacurso_ratings');
-        const generateButton = await getString('generatecommentaiglobal', 'local_datacurso_ratings');
-        const generateError = await getString('generatecommentaierror', 'local_datacurso_ratings');
-
+        const responseAi = {
+            loading: true,
+            success: false,
+            message: '',
+        };
         // Loading state
         button.disabled = true;
-        button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${generatingText}`;
-        resultContainer.innerHTML = '';
+        const htmlResponse = await Templates.render('local_datacurso_ratings/ai_analysis_response', responseAi);
+        resultContainer.innerHTML = htmlResponse;
 
         Ajax.call([{
             methodname: 'local_datacurso_ratings_get_ai_analysis_global',
             args: {},
         }])[0]
-            .done((response) => {
+            .done(async(response) => {
                 if (response && response.analysis) {
-                    resultContainer.innerHTML = `
-                    <div class="alert alert-info">
-                        <h6>${analysisTitle}</h6>
-                        <p>${response.analysis}</p>
-                    </div>`;
-                } else {
-                    resultContainer.innerHTML = `<div class="alert alert-warning">${generateError}</div>`;
+                    responseAi.loading = false;
+                    responseAi.success = true;
+                    responseAi.message = response.analysis;
+                    const htmlResponse = await Templates.render('local_datacurso_ratings/ai_analysis_response', responseAi);
+                    resultContainer.innerHTML = htmlResponse;
                 }
             })
-            .fail((e) => {
-                resultContainer.innerHTML = `
-                    <div class="alert alert-danger p-2 mb-2">
-                        <i class="fa fa-exclamation-triangle"></i> ${e.message}
-                    </div>`;
+            .fail(async(e) => {
+                responseAi.loading = false;
+                responseAi.success = false;
+                responseAi.message = e.message;
+                const htmlResponse = await Templates.render('local_datacurso_ratings/ai_analysis_response', responseAi);
+                resultContainer.innerHTML = htmlResponse;
             })
             .always(() => {
                 button.disabled = false;
-                button.innerHTML = `${generateButton} ✨`;
             });
     });
 };
 
-export default { init };
+export default {init};

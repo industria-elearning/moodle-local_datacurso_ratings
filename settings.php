@@ -36,7 +36,7 @@ if ($hassiteconfig) {
         'local_datacurso_ratings_feedback',
         get_string('managefeedback', 'local_datacurso_ratings'),
         new moodle_url('/local/datacurso_ratings/admin/feedback.php'),
-        'moodle/site:config' // Capacidad requerida.
+        'moodle/site:config'
     ));
 
     // Link report general ratings.

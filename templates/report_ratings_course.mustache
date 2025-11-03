@@ -40,26 +40,26 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0 text-white">{{#str}} reportSummary, local_datacurso_ratings {{/str}}</h5>
+                <h5 class="mb-0 text-white">{{#str}} reportsummary, local_datacurso_ratings {{/str}}</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-2 col-sm-4 text-center">
                         <div class="border-end">
                             <h3 class="text-primary mb-0">{{summary.total_activities}}</h3>
-                            <small class="text-muted">{{#str}} totalActivities, local_datacurso_ratings {{/str}}</small>
+                            <small class="text-muted">{{#str}} totalactivities, local_datacurso_ratings {{/str}}</small>
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-4 text-center">
                         <div class="border-end">
                             <h3 class="text-info mb-0">{{summary.activities_with_ratings}}</h3>
-                            <small class="text-muted">{{#str}} ratedActivities, local_datacurso_ratings {{/str}}</small>
+                            <small class="text-muted">{{#str}} ratedactivities, local_datacurso_ratings {{/str}}</small>
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-4 text-center">
                         <div class="border-end">
                             <h3 class="text-secondary mb-0">{{summary.total_ratings}}</h3>
-                            <small class="text-muted">{{#str}} totalRatings, local_datacurso_ratings {{/str}}</small>
+                            <small class="text-muted">{{#str}} totalratings, local_datacurso_ratings {{/str}}</small>
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-4 text-center">
@@ -99,7 +99,7 @@
         <thead class="table-light">
             <tr>
                 <th data-sort="actividad">{{#str}} activity, local_datacurso_ratings {{/str}}</th>
-                <th data-sort="total_ratings" class="text-center">{{#str}} totalRatings, local_datacurso_ratings {{/str}}</th>
+                <th data-sort="total_ratings" class="text-center">{{#str}} totalratings, local_datacurso_ratings {{/str}}</th>
                 <th data-sort="likes" class="text-center">👍 {{#str}} likes, local_datacurso_ratings {{/str}}</th>
                 <th data-sort="dislikes" class="text-center">👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</th>
                 <th data-sort="porcentaje" class="text-center">{{#str}} satisfaction, local_datacurso_ratings {{/str}}</th>
@@ -115,7 +115,7 @@
                             <a href="{{activityurl}}" target="_blank">{{actividad}}</a>
                         </strong>
                         {{^has_ratings}}
-                        <span class="badge bg-secondary ms-2 small">{{#str}} noRatings, local_datacurso_ratings {{/str}}</span>
+                        <span class="badge bg-secondary ms-2 small">{{#str}} noratings, local_datacurso_ratings {{/str}}</span>
                         {{/has_ratings}}
                     </div>
                 </td>
@@ -153,11 +153,11 @@
                             class="btn btn-sm btn-outline-info view-comments-modal"
                             data-cmid="{{cmid}}"
                             data-activity="{{activity}}">
-                        {{#str}} viewComments, local_datacurso_ratings {{/str}}
+                        {{#str}} viewcomments, local_datacurso_ratings {{/str}}
                     </button>
                     {{/has_comments}}
                     {{^has_comments}}
-                    <span class="text-muted">{{#str}} noComments, local_datacurso_ratings {{/str}}</span>
+                    <span class="text-muted">{{#str}} nocomments, local_datacurso_ratings {{/str}}</span>
                     {{/has_comments}}
                 </td>
             </tr>
@@ -174,8 +174,8 @@
     <div class="mb-4">
         <i class="fa fa-chart-line fa-3x text-muted"></i>
     </div>
-    <h4 class="text-muted">{{#str}} noDataAvailable, local_datacurso_ratings {{/str}}</h4>
-    <p class="text-muted">{{#str}} noDataDescription, local_datacurso_ratings {{/str}}</p>
+    <h4 class="text-muted">{{#str}} nodataavailable, local_datacurso_ratings {{/str}}</h4>
+    <p class="text-muted">{{#str}} nodatadescription, local_datacurso_ratings {{/str}}</p>
     <div class="mt-4">
         <a href="#" class="btn btn-primary" onclick="location.reload()">
             <i class="fa fa-refresh"></i> {{#str}} refresh, local_datacurso_ratings {{/str}}

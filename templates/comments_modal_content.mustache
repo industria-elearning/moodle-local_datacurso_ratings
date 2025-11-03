@@ -30,7 +30,7 @@
         <div class="card text-center h-100">
             <div class="card-body">
                 <h6 class="mb-0 text-primary">{{statistics.total_comments}}</h6>
-                <small class="text-muted">{{#str}} totalComments, local_datacurso_ratings {{/str}}</small>
+                <small class="text-muted">{{#str}} totalcomments, local_datacurso_ratings {{/str}}</small>
             </div>
         </div>
     </div>
@@ -38,7 +38,7 @@
         <div class="card text-center h-100">
             <div class="card-body">
                 <h6 class="mb-0 text-success">{{statistics.like_comments}}</h6>
-                <small class="text-muted">👍 {{#str}} positiveComments, local_datacurso_ratings {{/str}}</small>
+                <small class="text-muted">👍 {{#str}} positivecomments, local_datacurso_ratings {{/str}}</small>
             </div>
         </div>
     </div>
@@ -46,7 +46,7 @@
         <div class="card text-center h-100">
             <div class="card-body">
                 <h6 class="mb-0 text-danger">{{statistics.dislike_comments}}</h6>
-                <small class="text-muted">👎 {{#str}} negativeComments, local_datacurso_ratings {{/str}}</small>
+                <small class="text-muted">👎 {{#str}} negativecomments, local_datacurso_ratings {{/str}}</small>
             </div>
         </div>
     </div>
@@ -68,8 +68,8 @@
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-search"></i></span>
             <input type="text" class="form-control" id="comments-search" 
-                   placeholder="{{#str}} searchInComments, local_datacurso_ratings {{/str}}" 
-                   value="{{search_term}}">
+                   placeholder="{{#str}} searchincomments, local_datacurso_ratings {{/str}}" 
+                   value="{{searchterm}}">
             <button class="btn btn-outline-secondary" type="button" id="clear-search">
                 <i class="fa fa-times"></i> {{#str}} clear, local_datacurso_ratings {{/str}}
             </button>
@@ -111,7 +111,7 @@
             {{^comments}}
             <tr>
                 <td colspan="3" class="text-center text-muted py-4">
-                    {{#str}} noCommentsFound, local_datacurso_ratings {{/str}}
+                    {{#str}} nocommentsfound, local_datacurso_ratings {{/str}}
                 </td>
             </tr>
             {{/comments}}

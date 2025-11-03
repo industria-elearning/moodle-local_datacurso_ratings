@@ -47,10 +47,10 @@ final class privacy_provider_test extends provider_testcase {
         $collection = \local_datacurso_ratings\privacy\provider::get_metadata($collection);
         $items = $collection->get_collection();
 
-        // Obtener nombres de las tablas registradas en la metadata.
+        // Extract table names from the metadata.
         $foundtables = array_map(fn($item) => $item->get_name(), $items);
 
-        // Asegurar que las tablas esperadas existen.
+        // Savee that the expected tables exist.
         $this->assertContains('local_datacurso_ratings', $foundtables);
         $this->assertContains('local_datacurso_ratings_feedback', $foundtables);
     }
@@ -80,7 +80,7 @@ final class privacy_provider_test extends provider_testcase {
 
         $this->assertEmpty(\local_datacurso_ratings\privacy\provider::get_contexts_for_userid($user->id));
 
-        // Crear datos de usuario.
+        // Create user data and re-check.
         self::create_userdata($user->id);
 
         $contextlist = \local_datacurso_ratings\privacy\provider::get_contexts_for_userid($user->id);
@@ -101,11 +101,11 @@ final class privacy_provider_test extends provider_testcase {
         $usercontext = context_user::instance($user->id);
         $userlist = new userlist($usercontext, $component);
 
-        // Inicialmente vacío.
+        // Empty initially.
         \local_datacurso_ratings\privacy\provider::get_users_in_context($userlist);
         $this->assertCount(0, $userlist);
 
-        // Crear datos y volver a comprobar.
+        // Create user data. and re-check.
         self::create_userdata($user->id);
         \local_datacurso_ratings\privacy\provider::get_users_in_context($userlist);
         $this->assertNotEmpty($userlist->get_userids());

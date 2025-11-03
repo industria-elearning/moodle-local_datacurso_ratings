@@ -42,13 +42,13 @@ class feedback_page implements renderable, templatable {
     /**
      * Constructor.
      *
-     * @param string $type Tipo de feedback a mostrar (like o dislike)
+     * @param string $type Type of feedback to display.
      */
     public function __construct(string $type) {
         global $DB;
         $this->type = $type;
 
-        // Filtrar directamente desde la base de datos.
+        // Fetch feedback items from the database.
         $this->items = $DB->get_records(
             'local_datacurso_ratings_feedback',
             ['type' => $this->type],

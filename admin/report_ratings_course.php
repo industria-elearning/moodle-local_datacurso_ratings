@@ -33,9 +33,7 @@ $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 // Security checks.
 require_login($course);
 $context = context_course::instance($course->id);
-
-// Access for teachers and managers.
-require_capability('local/datacurso_ratings:viewreports', $context);
+require_capability('local/datacurso_ratings:viewcoursereport', $context);
 
 // Set up page.
 $PAGE->set_url('/local/datacurso_ratings/admin/report_ratings_course.php', ['id' => $courseid]);

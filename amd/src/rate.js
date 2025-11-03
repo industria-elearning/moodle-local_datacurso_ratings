@@ -21,13 +21,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* eslint-disable */
 import Ajax from 'core/ajax';
-import { get_string as getString } from 'core/str';
+import {get_string as getString} from 'core/str';
+import Notification from 'core/notification';
+import Templates from 'core/templates';
 
 /**
  * Initialise rating widget for the given cmid.
- * @param {Number} cmid
+ *
+ * @param {number} cmid - Course module ID.
  */
 export const init = (cmid) => {
     const container = document.querySelector(`.local-dcr-rate[data-cmid="${cmid}"]`);
@@ -44,14 +46,22 @@ export const init = (cmid) => {
     const dislikeOptions = container.querySelector('.dislike-options');
     const msgResponse = container.querySelector('.message-response-rate');
 
-    const show = el => {
+    /**
+     * Show element.
+     * @param {HTMLElement} el
+     */
+    const show = (el) => {
         if (el) {
             el.style.display = 'block';
             el.setAttribute('aria-hidden', 'false');
         }
     };
 
-    const hide = el => {
+    /**
+     * Hide element.
+     * @param {HTMLElement} el
+     */
+    const hide = (el) => {
         if (el) {
             el.style.display = 'none';
             el.setAttribute('aria-hidden', 'true');
@@ -60,34 +70,30 @@ export const init = (cmid) => {
 
     /**
      * Display a feedback message inside the message-response-rate div.
-     * @param {String} message The message text.
-     * @param {String} type "success" or "error".
+     * @param {string} message The message text.
+     * @param {string} [type='success'] Message type: success|error.
      */
-    const showMessage = (message, type = 'success') => {
+    const showMessage = async(message, type = 'success') => {
         if (!msgResponse) {
             return;
         }
 
-        msgResponse.innerHTML = `
-            <div class="alert alert-${type === 'success' ? 'success' : 'danger'}" role="alert" style="margin-top:0.5rem;">
-                ${message}
-            </div>
-        `;
+        const htmlMessage = await Templates.render('local_datacurso_ratings/rate_message_response', {message, type});
+
+        msgResponse.innerHTML = htmlMessage;
     };
 
-    // Events for rate 👍 and 👎.
-    container.querySelectorAll('[data-action="rate"]').forEach(btn => {
+    // Handle like/dislike button click.
+    container.querySelectorAll('[data-action="rate"]').forEach((btn) => {
         btn.addEventListener('click', () => {
             const rating = parseInt(btn.dataset.rating, 10);
 
             if (rating === 0) {
-                // Dislike → show dislike options.
                 show(fbBlock);
                 show(dislikeOptions);
                 hide(likeOptions);
                 sendBtn?.setAttribute('data-rating', '0');
             } else {
-                // Like → show like options.
                 show(fbBlock);
                 show(likeOptions);
                 hide(dislikeOptions);
@@ -98,8 +104,8 @@ export const init = (cmid) => {
         });
     });
 
-    // Show textarea if "Others".
-    container.querySelectorAll('input[name="feedback_choice"]').forEach(radio => {
+    // Show textarea if “Other” is selected.
+    container.querySelectorAll('input[name="feedback_choice"]').forEach((radio) => {
         radio.addEventListener('change', () => {
             if (radio.value === 'other' && radio.checked) {
                 show(fbTextareaWrap);
@@ -114,11 +120,20 @@ export const init = (cmid) => {
     cancelBtn?.addEventListener('click', () => {
         hide(fbBlock);
         hide(fbTextareaWrap);
-        if (fbInput) fbInput.value = '';
+        if (fbInput) {
+            fbInput.value = '';
+            fbInput.disabled = false;
+        }
 
-        container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.checked = false);
+        container.querySelectorAll('input[name="feedback_choice"]').forEach((r) => {
+            r.checked = false;
+            r.disabled = false;
+        });
+
         sendBtn?.removeAttribute('data-rating');
-        msgResponse.innerHTML = ''; // Clean previous message.
+        sendBtn.disabled = false;
+        cancelBtn.disabled = false;
+        msgResponse.innerHTML = '';
     });
 
     // Send feedback.
@@ -136,38 +151,45 @@ export const init = (cmid) => {
 
     /**
      * Send rating to server via Ajax.
-     * @param {Number} cmid
-     * @param {Number} rating
-     * @param {String} feedback
+     *
+     * @param {number} cmid
+     * @param {number} rating
+     * @param {string} feedback
      */
-    function sendRating(cmid, rating, feedback) {
-        Ajax.call([{
+    const sendRating = (cmid, rating, feedback) => {
+        const requests = Ajax.call([{
             methodname: 'local_datacurso_ratings_save_rating',
-            args: { cmid, rating, feedback }
-        }])[0]
+            args: {cmid, rating, feedback}
+        }]);
+
+        requests[0]
             .then(async () => {
                 const saved = await getString('ratingsaved', 'local_datacurso_ratings');
                 showMessage(saved, 'success');
 
                 // Disable inputs after sending.
-                if (container) {
-                    container.querySelectorAll('[data-action="rate"]').forEach(btn => btn.disabled = true);
-                    container.querySelectorAll('input[name="feedback_choice"]').forEach(r => r.disabled = true);
-                    if (sendBtn) sendBtn.disabled = true;
-                    if (cancelBtn) cancelBtn.disabled = true;
-                    if (fbInput) fbInput.disabled = true;
+                container.querySelectorAll('[data-action="rate"]').forEach((btn) => {
+                    btn.disabled = true;
+                });
+                container.querySelectorAll('input[name="feedback_choice"]').forEach((r) => {
+                    r.disabled = true;
+                });
+
+                if (sendBtn) {
+                    sendBtn.disabled = true;
+                }
+                if (cancelBtn) {
+                    cancelBtn.disabled = true;
+                }
+                if (fbInput) {
+                    fbInput.disabled = true;
                 }
 
                 hide(fbBlock);
                 hide(fbTextareaWrap);
-                console.log("save")
             })
-            .catch(async (error) => {
-                console.error(error);
-                const errMsg = await getString('errorrating', 'local_datacurso_ratings');
-                showMessage(errMsg, 'error');
-            });
-    }
+            .catch((e)=> (Notification.exception(e)));
+    };
 };
 
-export default { init };
+export default {init};

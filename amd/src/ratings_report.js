@@ -21,7 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* eslint-disable */
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
 import Notification from 'core/notification';
@@ -39,7 +38,8 @@ export const init = () => {
     try {
         categories = JSON.parse(container.dataset.categories || '[]');
     } catch (e) {
-        console.warn("No se pudieron parsear las categorías", e);
+        Notification.alert('Error', 'Error parsing categories data: ' + e.message, 'OK');
+        return;
     }
 
     // Show loading state
@@ -50,12 +50,8 @@ export const init = () => {
         methodname: 'local_datacurso_ratings_get_ratings_report',
         args: {}
     }])[0]
-        .then((data) => {
-            return processGeneralReportData(data, categories);
-        })
-        .then((templateData) => {
-            return Templates.render('local_datacurso_ratings/ratings_report_page', templateData);
-        })
+        .then((data) => processGeneralReportData(data, categories))
+        .then((templateData) => Templates.render('local_datacurso_ratings/ratings_report_page', templateData))
         .then((html, js) => {
             // Replace loading with actual content
             container.innerHTML = html;
@@ -65,8 +61,7 @@ export const init = () => {
             initGeneralTableFeatures();
         })
         .catch((error) => {
-            console.error('Error loading general ratings report:', error);
-            showError(container, error);
+            Notification.exception(error);
         });
 };
 
@@ -83,13 +78,13 @@ function processGeneralReportData(data, categories) {
     let totalDislikes = 0;
     let totalActivities = 0;
 
-    data.forEach(activity => {
-        const courseName = activity.course;
+    data.forEach((activity) => {
+        const courseName = activity.course || 'Unnamed course';
 
         if (!courseGroups[courseName]) {
             courseGroups[courseName] = {
                 courseName: courseName,
-                categoryid: activity.categoryid || '', // <= importante para filtro
+                categoryid: activity.categoryid || '',
                 activities: [],
                 courseLikes: 0,
                 courseDislikes: 0,
@@ -97,35 +92,44 @@ function processGeneralReportData(data, categories) {
             };
         }
 
+        // Defensive defaults
+        const likes = Number(activity.likes || 0);
+        const dislikes = Number(activity.dislikes || 0);
+        const approvalpercent = Number(activity.approvalpercent || 0);
+        const comments = Array.isArray(activity.comments) ? activity.comments : [];
+
         // Process individual activity
         const processedActivity = {
             ...activity,
-            total_ratings: activity.likes + activity.dislikes,
-            has_ratings: (activity.likes + activity.dislikes) > 0,
-            has_comments: activity.comments && activity.comments.length > 0,
-            satisfaction_class: getSatisfactionClass(activity.approvalpercent),
-            formatted_percentage: activity.approvalpercent ? activity.approvalpercent.toFixed(1) + '%' : '0%',
-            comments_count: activity.comments ? activity.comments.length : 0,
-            comments_text: activity.comments ? activity.comments.join(' / ') : ''
+            likes,
+            dislikes,
+            total_ratings: likes + dislikes,
+            has_ratings: (likes + dislikes) > 0,
+            has_comments: comments.length > 0,
+            satisfaction_class: getSatisfactionClass(approvalpercent),
+            formatted_percentage: `${approvalpercent.toFixed(1)}%`,
+            comments_count: comments.length,
+            comments_text: comments.join(' / ')
         };
 
         courseGroups[courseName].activities.push(processedActivity);
-        courseGroups[courseName].courseLikes += activity.likes;
-        courseGroups[courseName].courseDislikes += activity.dislikes;
+        courseGroups[courseName].courseLikes += likes;
+        courseGroups[courseName].courseDislikes += dislikes;
         courseGroups[courseName].courseActivities += 1;
 
         // Global totals
-        totalLikes += activity.likes;
-        totalDislikes += activity.dislikes;
+        totalLikes += likes;
+        totalDislikes += dislikes;
         totalActivities += 1;
     });
 
     // Calculate course-level statistics
-    Object.keys(courseGroups).forEach(courseName => {
+    Object.keys(courseGroups).forEach((courseName) => {
         const course = courseGroups[courseName];
         const courseTotal = course.courseLikes + course.courseDislikes;
-        course.courseSatisfaction = courseTotal > 0 ?
-            ((course.courseLikes / courseTotal) * 100).toFixed(1) : '0';
+        course.courseSatisfaction = courseTotal > 0
+            ? ((course.courseLikes / courseTotal) * 100).toFixed(1)
+            : '0';
         course.courseSatisfactionClass = getSatisfactionClass(parseFloat(course.courseSatisfaction));
         course.courseTotal = courseTotal;
 
@@ -142,7 +146,7 @@ function processGeneralReportData(data, categories) {
     return {
         courses: coursesArray,
         has_data: coursesArray.length > 0,
-        categories: categories, 
+        categories,
         summary: {
             total_courses: coursesArray.length,
             total_activities: totalActivities,
@@ -151,7 +155,7 @@ function processGeneralReportData(data, categories) {
             total_dislikes: totalDislikes,
             overall_satisfaction: overallSatisfaction.toFixed(1),
             satisfaction_class: getSatisfactionClass(overallSatisfaction),
-            activities_with_ratings: data.filter(a => (a.likes + a.dislikes) > 0).length
+            activities_with_ratings: data.filter((a) => (Number(a.likes || 0) + Number(a.dislikes || 0)) > 0).length
         }
     };
 }
@@ -162,40 +166,20 @@ function processGeneralReportData(data, categories) {
  * @returns {String}
  */
 function getSatisfactionClass(percentage) {
-    if (percentage >= 80) return 'success';
-    if (percentage >= 60) return 'warning';
-    if (percentage >= 40) return 'info';
+    if (percentage >= 80) { return 'success'; }
+    if (percentage >= 60) { return 'warning'; }
+    if (percentage >= 40) { return 'info'; }
     return 'danger';
 }
 
 /**
- * Show loading state
- * @param {Element} container
+ * Display a loading spinner.
+ *
+ * @param {HTMLElement} container
  */
-function showLoading(container) {
-    container.innerHTML = `
-        <div class="text-center p-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Cargando...</span>
-            </div>
-            <p class="mt-2">Cargando reporte general de calificaciones...</p>
-        </div>
-    `;
-}
-
-/**
- * Show error message
- * @param {Element} container
- * @param {Object} error
- */
-function showError(container, error) {
-    container.innerHTML = `
-        <div class="alert alert-danger">
-            <h4>Error al cargar el reporte</h4>
-            <p>No se pudo cargar la información del reporte general. Por favor, intente nuevamente.</p>
-            <small>Error: ${error.message || 'Error desconocido'}</small>
-        </div>
-    `;
+export async function showLoading(container) {
+    const html = await Templates.render('local_datacurso_ratings/report_ratings_loading', {});
+    container.innerHTML = html;
 }
 
 /**
@@ -203,20 +187,26 @@ function showError(container, error) {
  */
 function initGeneralTableFeatures() {
     // Course collapse/expand functionality
-    document.querySelectorAll('.course-toggle').forEach(button => {
-        button.addEventListener('click', (e) => {
+    document.querySelectorAll('.course-toggle').forEach((button) => {
+        button.addEventListener('click', () => {
             const target = button.getAttribute('data-target');
             const courseContent = document.querySelector(target);
             const icon = button.querySelector('i');
 
+            if (!courseContent) { return; }
+
             if (courseContent.classList.contains('show')) {
                 courseContent.classList.remove('show');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-right');
+                if (icon) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-right');
+                }
             } else {
                 courseContent.classList.add('show');
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-down');
+                if (icon) {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-down');
+                }
             }
         });
     });
@@ -247,80 +237,79 @@ function initFilterFeatures() {
             let categoryid = '';
 
             const datalist = document.querySelector('#categories');
-            const options = datalist.querySelectorAll('option');
-            
-            options.forEach(option => {
-                if (option.value === selectedName) {
-                    categoryid = option.getAttribute('data-id') || '';
-                }
-            });
-            
-            // Save ID in data attribute
-            categoryFilter.setAttribute('data-category-id', categoryid);
+            if (datalist) {
+                const options = datalist.querySelectorAll('option');
+                options.forEach((option) => {
+                    if (option.value === selectedName) {
+                        categoryid = option.getAttribute('data-id') || '';
+                    }
+                });
+            }
+
+            // Store id in dataset (use consistent key)
+            categoryFilter.dataset.categoryId = categoryid;
 
             filterActivities();
-            
             updateCoursesByCategory(categoryid);
         });
     }
 }
 
 /**
- * Llama al WS para traer cursos de una categoría y actualizar el selector de cursos
+ * Call WS to fetch courses of a category and update the course selector
  * @param {String|Number} categoryid
  */
 function updateCoursesByCategory(categoryid) {
     const courseFilter = document.querySelector('#course-filter');
     const coursesDatalist = document.querySelector('#courses');
-    
     if (!courseFilter || !coursesDatalist) {
         return;
     }
 
     courseFilter.value = '';
-    coursesDatalist.innerHTML = '<option value="Todos los cursos">Todos los cursos</option>';
 
-    if (categoryid === '') {
+    if (!categoryid) {
         return;
     }
 
     Ajax.call([{
         methodname: 'local_datacurso_ratings_get_courses_by_category',
-        args: { categoryid: parseInt(categoryid) }
+        args: { categoryid: parseInt(categoryid, 10) }
     }])[0]
-    .then((courses) => {
-        if (courses && courses.length) {
-            courses.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course.fullname;
-                option.textContent = course.fullname;
-                coursesDatalist.appendChild(option);
-            });
-        }
-    })
-    .catch(Notification.exception);
+        .then((courses) => {
+            if (Array.isArray(courses) && courses.length) {
+                courses.forEach((course) => {
+                    const option = document.createElement('option');
+                    option.value = course.fullname;
+                    option.textContent = course.fullname;
+                    coursesDatalist.appendChild(option);
+                });
+            }
+        })
+        .catch((err) => {
+            Notification.exception(err);
+        });
 }
 
 /**
  * Filter activities based on search and course selection
  */
 function filterActivities() {
-    const searchTerm = document.querySelector('#activity-search')?.value.toLowerCase() || '';
+    const searchTerm = (document.querySelector('#activity-search')?.value || '').toLowerCase();
     const selectedCourse = document.querySelector('#course-filter')?.value || '';
     const categoryFilter = document.querySelector('#category-filter');
-    const selectedCategory = categoryFilter?.getAttribute('data-category-id') || '';
+    const selectedCategory = categoryFilter?.dataset?.categoryId || '';
 
-    document.querySelectorAll('.course-section').forEach(section => {
-        const courseId = section.getAttribute('data-course');
-        const categoryId = section.getAttribute('data-category');
+    document.querySelectorAll('.course-section').forEach((section) => {
+        const courseId = section.getAttribute('data-course') || '';
+        const categoryId = section.getAttribute('data-category') || '';
         let courseVisible = false;
 
         const matchesCategory = selectedCategory === '' || categoryId === selectedCategory;
 
         if (matchesCategory && (selectedCourse === '' || courseId === selectedCourse)) {
-
-            section.querySelectorAll('.activity-row').forEach(row => {
-                const activityName = row.getAttribute('data-activity').toLowerCase();
+            section.querySelectorAll('.activity-row').forEach((row) => {
+                const activityName = (row.getAttribute('data-activity') || '').toLowerCase();
                 const matchesSearch = searchTerm === '' || activityName.includes(searchTerm);
 
                 if (matchesSearch) {

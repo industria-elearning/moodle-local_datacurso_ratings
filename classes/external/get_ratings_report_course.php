@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * External service to get course-level ratings report.
+ *
+ * @package    local_datacurso_ratings
+ * @category   external
+ * @copyright  2025 Industria Elearning
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_datacurso_ratings\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -26,87 +35,99 @@ use external_single_structure;
 use external_multiple_structure;
 use external_api;
 use context_course;
-use core\context;
 use moodle_exception;
+use core\context;
 
 /**
- * External service to get course-level ratings report.
+ * Web service to get course report of activities with ratings.
  *
  * @package    local_datacurso_ratings
- * @category   external
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_ratings_report_course extends external_api {
     /**
-     * Function input parameters.
+     * Define parameters.
      *
      * @return external_function_parameters
      */
     public static function execute_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'Course ID'),
+            'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED),
         ]);
     }
 
     /**
-     * Main logic: queries and returns the information.
+     * Main logic: returns activities with their ratings for a course.
      *
-     * @param int $courseid Course ID
+     * @param int $courseid
      * @return array
+     * @throws moodle_exception
      */
     public static function execute($courseid) {
-        global $DB, $USER;
+        global $DB;
 
-        $params = self::validate_parameters(self::execute_parameters(), [
-            'courseid' => $courseid,
-        ]);
+        $params = self::validate_parameters(self::execute_parameters(), ['courseid' => $courseid]);
 
+        // Validate context.
         $context = context_course::instance($params['courseid']);
         self::validate_context($context);
+        require_capability('local/datacurso_ratings:viewcoursereport', $context);
 
-        // Initialize course modinfo.
+        // Ensure course exists.
+        if (!$DB->record_exists('course', ['id' => $params['courseid']])) {
+            throw new moodle_exception('invalidcourseid', 'error');
+        }
+
+        // Get all course modules.
         $modinfo = get_fast_modinfo($params['courseid']);
         $cms = $modinfo->get_cms();
 
         $result = [];
 
+        // Detect DB type for comment aggregation.
+        $dbfamily = $DB->get_dbfamily();
+        $concatcomments = ($dbfamily === 'postgres')
+            ? "STRING_AGG(DISTINCT r.feedback, ' / ')"
+            : "GROUP_CONCAT(DISTINCT r.feedback SEPARATOR ' / ')";
+
         foreach ($cms as $cm) {
             if (!$cm->uservisible) {
-                continue; // Skip if the user cannot see the module.
+                continue; // Skip hidden or restricted modules.
             }
 
-            // Get ratings for this activity.
+            // Aggregate likes/dislikes and comments for each module.
             $sql = "
                 SELECT
-                    SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
-                    SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes,
-                    ROUND(
-                        SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(r.id), 0),
-                        1
-                    ) AS porcentaje_aprobacion,
-                    GROUP_CONCAT(DISTINCT r.feedback SEPARATOR ' / ') AS comentarios
+                    COALESCE(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END), 0) AS likes,
+                    COALESCE(SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END), 0) AS dislikes,
+                    COALESCE(
+                        ROUND(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(r.id), 0), 1),
+                        0
+                    ) AS approvalpercent,
+                    $concatcomments AS comments
                 FROM {local_datacurso_ratings} r
                 WHERE r.cmid = :cmid
             ";
 
             $record = $DB->get_record_sql($sql, ['cmid' => $cm->id]);
 
-            // If there are no votes yet, initialize to 0.
-            $likes = (int)($record->likes ?? 0);
-            $dislikes = (int)($record->dislikes ?? 0);
-            $porcentaje = (float)($record->porcentaje_aprobacion ?? 0);
-            $comentarios = $record->comentarios ?? '';
+            $commentsarray = [];
+            if (!empty($record->comments)) {
+                $commentsarray = preg_split('/\s*\/\s*/', trim($record->comments));
+            }
 
             $result[] = [
-                'curso' => $modinfo->get_course()->fullname,
-                'actividad' => $cm->name,
-                'modulo' => $cm->modname,
+                'course' => $modinfo->get_course()->fullname,
+                'categoryid' => $modinfo->get_course()->category,
+                'activity' => $cm->name,
+                'modname' => $cm->modname,
                 'cmid' => (int)$cm->id,
-                'likes' => $likes,
-                'dislikes' => $dislikes,
-                'porcentaje' => $porcentaje,
-                'comentarios' => $comentarios,
+                'url' => $cm->url ? $cm->url->out(false) : '',
+                'likes' => (int)$record->likes,
+                'dislikes' => (int)$record->dislikes,
+                'approvalpercent' => (float)$record->approvalpercent,
+                'comments' => $commentsarray,
             ];
         }
 
@@ -114,21 +135,27 @@ class get_ratings_report_course extends external_api {
     }
 
     /**
-     * Output structure.
+     * Define return structure.
      *
      * @return external_multiple_structure
      */
     public static function execute_returns() {
         return new external_multiple_structure(
             new external_single_structure([
-                'curso' => new external_value(PARAM_TEXT, 'Course name'),
-                'actividad' => new external_value(PARAM_TEXT, 'Activity name'),
-                'modulo' => new external_value(PARAM_TEXT, 'Module type'),
+                'course' => new external_value(PARAM_TEXT, 'Course name'),
+                'categoryid' => new external_value(PARAM_INT, 'Category ID'),
+                'activity' => new external_value(PARAM_TEXT, 'Activity name'),
+                'modname' => new external_value(PARAM_TEXT, 'Module type'),
                 'cmid' => new external_value(PARAM_INT, 'Course module ID'),
+                'url' => new external_value(PARAM_URL, 'Activity URL', VALUE_OPTIONAL),
                 'likes' => new external_value(PARAM_INT, 'Number of likes'),
                 'dislikes' => new external_value(PARAM_INT, 'Number of dislikes'),
-                'porcentaje' => new external_value(PARAM_FLOAT, 'Approval percentage'),
-                'comentarios' => new external_value(PARAM_RAW, 'Concatenated comments'),
+                'approvalpercent' => new external_value(PARAM_FLOAT, 'Approval percentage'),
+                'comments' => new external_multiple_structure(
+                    new external_value(PARAM_RAW, 'Individual comment'),
+                    'List of comments',
+                    VALUE_OPTIONAL
+                ),
             ])
         );
     }
