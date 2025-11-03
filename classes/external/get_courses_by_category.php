@@ -62,6 +62,7 @@ class get_courses_by_category extends external_api {
         // Validate system context.
         $context = context_system::instance();
         self::validate_context($context);
+        require_capability('moodle/site:config', $context);
 
         // Verify that the category exists.
         $category = $DB->get_record('course_categories', ['id' => $params['categoryid']], '*', MUST_EXIST);
@@ -69,7 +70,7 @@ class get_courses_by_category extends external_api {
         // Get courses from the category.
         $courses = $DB->get_records('course', [
             'category' => $params['categoryid'],
-            'visible' => 1, // Only visible courses.
+            'visible' => 1,
         ], 'fullname ASC', 'id, fullname, shortname, category');
 
         // Process results.
@@ -84,7 +85,7 @@ class get_courses_by_category extends external_api {
             $coursecontext = \context_course::instance($course->id);
             if (
                 has_capability('moodle/course:view', $coursecontext) ||
-                has_capability('local/datacurso_ratings:viewreports', $coursecontext)
+                has_capability('local/datacurso_ratings:viewcoursereport', $coursecontext)
             ) {
                 $result[] = [
                     'id' => $course->id,

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_datacurso_ratings';
-$plugin->version   = 2025101700;
+$plugin->version   = 2025103100;
 $plugin->requires = 2024100700;
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = '1.0.0';

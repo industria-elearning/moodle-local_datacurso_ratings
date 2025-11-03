@@ -61,6 +61,7 @@ class feedback_service extends external_api {
             self::add_feedback_parameters(),
             ['feedbacktext' => $feedbacktext, 'type' => $type]
         );
+        require_capability('moodle/site:config', context_system::instance());
 
         $record = (object)[
             'feedbacktext' => $params['feedbacktext'],
@@ -107,6 +108,7 @@ class feedback_service extends external_api {
 
         self::validate_context(context_system::instance());
         $params = self::validate_parameters(self::delete_feedback_parameters(), ['id' => $id]);
+        require_capability('moodle/site:config', context_system::instance());
 
         $DB->delete_records('local_datacurso_ratings_feedback', ['id' => $params['id']]);
 

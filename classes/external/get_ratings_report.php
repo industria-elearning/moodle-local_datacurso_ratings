@@ -31,7 +31,7 @@ use context_system;
  * Web service to get general report of activities with ratings.
  *
  * @package    local_datacurso_ratings
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
+ * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_ratings_report extends external_api {
@@ -54,29 +54,40 @@ class get_ratings_report extends external_api {
 
         $params = self::validate_parameters(self::execute_parameters(), []);
 
-        // Validate system context (because it's a global report).
+        // Validate context.
         $context = context_system::instance();
         self::validate_context($context);
+        require_capability('moodle/site:config', $context);
 
-        // 1. Get ratings grouped by cmid.
+        // Detect DB type for compatibility.
+        $dbfamily = $DB->get_dbfamily();
+
+        // Handle GROUP_CONCAT / STRING_AGG depending on DB type.
+        if ($dbfamily === 'postgres') {
+            $concatcomments = "STRING_AGG(DISTINCT r.feedback, ' / ') AS comentarios";
+        } else {
+            $concatcomments = "GROUP_CONCAT(DISTINCT r.feedback SEPARATOR ' / ') AS comentarios";
+        }
+
+        // Main SQL query (compatible with both MySQL and PostgreSQL).
         $sql = "
             SELECT r.cmid,
                    cm.course,
                    SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
                    SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes,
-                   ROUND(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(r.id), 1) AS porcentaje_aprobacion,
-                   GROUP_CONCAT(DISTINCT r.feedback SEPARATOR ' / ') AS comentarios
+                   ROUND(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(r.id), 0), 1) AS porcentaje_aprobacion,
+                   {$concatcomments}
             FROM {local_datacurso_ratings} r
             JOIN {course_modules} cm ON cm.id = r.cmid
             GROUP BY r.cmid, cm.course
             ORDER BY cm.course ASC
         ";
-        $records = $DB->get_records_sql($sql);
 
+        $records = $DB->get_records_sql($sql);
         $result = [];
 
-        // 2. Group by course using get_fast_modinfo.
-        $coursecache = []; // Local cache to avoid recalculating modinfo multiple times.
+        // Cache to reuse modinfo per course.
+        $coursecache = [];
 
         foreach ($records as $r) {
             $courseid = $r->course;
@@ -84,18 +95,20 @@ class get_ratings_report extends external_api {
             if (!isset($coursecache[$courseid])) {
                 $coursecache[$courseid] = get_fast_modinfo($courseid);
             }
+
             $modinfo = $coursecache[$courseid];
 
-            // Get module info.
+            // Validate module existence.
             if (!$modinfo->cms || !isset($modinfo->cms[$r->cmid])) {
-                continue; // If cmid doesn't exist, skip.
+                continue;
             }
 
             $cm = $modinfo->get_cm($r->cmid);
             if (!$cm->uservisible) {
-                continue; // Skip if user doesn't have permission to see it.
+                continue;
             }
 
+            // Prepare comments array.
             $commentsarray = [];
             if (!empty($r->comentarios)) {
                 $commentsarray = explode(' / ', $r->comentarios);

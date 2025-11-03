@@ -31,7 +31,7 @@
  */
 function local_datacurso_ratings_extend_navigation_course($navigation, $course, $context) {
     // Teachers and managers can see the report.
-    if (has_capability('local/datacurso_ratings:viewreports', $context)) {
+    if (has_capability('local/datacurso_ratings:viewcoursereport', $context)) {
         // Search especific the nodo of "Reports".
         $reportsnode = $navigation->get('coursereports');
         if ($reportsnode) {

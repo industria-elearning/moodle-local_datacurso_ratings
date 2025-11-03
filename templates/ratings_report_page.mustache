@@ -30,26 +30,26 @@
     <div class="col-12">
         <div class="card border-primary">
            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0 text-white">{{#str}} globalReportSummary, local_datacurso_ratings {{/str}}</h5>
+                <h5 class="mb-0 text-white">{{#str}} globalreportsummary, local_datacurso_ratings {{/str}}</h5>
             </div>
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
                         <div class="pe-3 border-end">
                             <h3 class="mb-0" style="color: var(--primary);">{{summary.total_courses}}</h3>
-                            <small class="text-muted">{{#str}} totalCourses, local_datacurso_ratings {{/str}}</small>
+                            <small class="text-muted">{{#str}} totalcourses, local_datacurso_ratings {{/str}}</small>
                         </div>
                     </div>
                     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
                         <div class="pe-3 border-end">
                             <h3 class="mb-0" style="color: var(--info);">{{summary.total_activities}}</h3>
-                            <small class="text-muted">{{#str}} totalActivities, local_datacurso_ratings {{/str}}</small>
+                            <small class="text-muted">{{#str}} totalactivities, local_datacurso_ratings {{/str}}</small>
                         </div>
                     </div>
                     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
                         <div class="border-end">
                             <h3 class="text-secondary mb-0">{{summary.activities_with_ratings}}</h3>
-                            <small class="text-muted">{{#str}} ratedActivities, local_datacurso_ratings {{/str}}</small>
+                            <small class="text-muted">{{#str}} ratedactivities, local_datacurso_ratings {{/str}}</small>
                         </div>
                     </div>
                     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
@@ -62,7 +62,7 @@
                     </div>
                     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
                         <h3 class="mb-0 text-{{summary.satisfaction_class}}">{{summary.overall_satisfaction}}%</h3>
-                        <small class="text-muted">{{#str}} globalSatisfaction, local_datacurso_ratings {{/str}}</small>
+                        <small class="text-muted">{{#str}} globalsatisfaction, local_datacurso_ratings {{/str}}</small>
                     </div>
                 </div>
             </div>
@@ -85,28 +85,28 @@
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-search"></i></span>
             <input type="text" class="form-control" id="activity-search"
-                placeholder="{{#str}} searchActivities, local_datacurso_ratings {{/str}}">
+                placeholder="{{#str}} searchactivities, local_datacurso_ratings {{/str}}">
         </div>
     </div>
 
-    <!-- Category filter con datalist -->
+    <!-- Category filter with datalist -->
     <div class="col-md-3">
         <input list="categories" class="form-control" id="category-filter" 
                placeholder="{{#str}} searchcategories, local_datacurso_ratings {{/str}}" data-category-id="">
         <datalist id="categories">
-            <option value="Todas las categorías" data-id="">{{#str}} allcategories, local_datacurso_ratings {{/str}}</option>
+            <option value="{{#str}} allcategories, local_datacurso_ratings {{/str}}" data-id="">{{#str}} allcategories, local_datacurso_ratings {{/str}}</option>
             {{#categories}}
             <option value="{{name}}" data-id="{{id}}">{{name}}</option>
             {{/categories}}
         </datalist>
     </div>
     
-    <!-- Course filter con datalist -->
+    <!-- Course filter with datalist -->
     <div class="col-md-3">
         <input list="courses" class="form-control" id="course-filter" 
                placeholder="{{#str}} searchcourses, local_datacurso_ratings {{/str}}">
         <datalist id="courses">
-            <option value="Todos los cursos">{{#str}} allcourses, local_datacurso_ratings {{/str}}</option>
+            <option value="{{#str}} allcourses, local_datacurso_ratings {{/str}}">{{#str}} allcourses, local_datacurso_ratings {{/str}}</option>
         </datalist>
     </div>
 </div>
@@ -135,11 +135,11 @@
                     <table class="table mb-0">
                          <thead>
                             <tr>
-                                <th data-sort="actividad">{{#str}} activity, local_datacurso_ratings {{/str}}</th>
-                                <th data-sort="total_ratings" class="text-center">{{#str}} totalRatings, local_datacurso_ratings {{/str}}</th>
-                                <th data-sort="likes" class="text-center">👍 {{#str}} likes, local_datacurso_ratings {{/str}}</th>
-                                <th data-sort="dislikes" class="text-center">👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</th>
-                                <th data-sort="porcentaje" class="text-center">{{#str}} satisfaction, local_datacurso_ratings {{/str}}</th>
+                                <th>{{#str}} activity, local_datacurso_ratings {{/str}}</th>
+                                <th class="text-center">{{#str}} totalratings, local_datacurso_ratings {{/str}}</th>
+                                <th class="text-center">👍 {{#str}} likes, local_datacurso_ratings {{/str}}</th>
+                                <th class="text-center">👎 {{#str}} dislikes, local_datacurso_ratings {{/str}}</th>
+                                <th class="text-center">{{#str}} satisfaction, local_datacurso_ratings {{/str}}</th>
                                 <th class="text-center">{{#str}} comments, local_datacurso_ratings {{/str}}</th>
                             </tr>
                         </thead>
@@ -149,12 +149,12 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <strong>
-                                        <a href="{{url}}" target="_blank" title="{{#str}} viewActivity, local_datacurso_ratings {{/str}}">
+                                        <a href="{{url}}" target="_blank" title="{{#str}} viewactivity, local_datacurso_ratings {{/str}}">
                                             {{activity}}
                                         </a>
                                         </strong>
                                         {{^has_ratings}}
-                                        <span class="badge bg-secondary ms-2 small">{{#str}} noRatings, local_datacurso_ratings {{/str}}</span>
+                                        <span class="badge bg-secondary ms-2 small">{{#str}} noratings, local_datacurso_ratings {{/str}}</span>
                                         {{/has_ratings}}
                                     </div>
                                 </td>
@@ -192,11 +192,11 @@
                                             class="btn btn-sm btn-outline-info view-comments-modal"
                                             data-cmid="{{cmid}}"
                                             data-activity="{{activity}}">
-                                        {{#str}} viewComments, local_datacurso_ratings {{/str}}
+                                        {{#str}} viewcomments, local_datacurso_ratings {{/str}}
                                     </button>
                                     {{/has_comments}}
                                     {{^has_comments}}
-                                    <span class="text-muted">{{#str}} noComments, local_datacurso_ratings {{/str}}</span>
+                                    <span class="text-muted">{{#str}} nocomments, local_datacurso_ratings {{/str}}</span>
                                     {{/has_comments}}
                                 </td>
                             </tr>
@@ -218,11 +218,11 @@
     <div class="mb-4">
         <i class="fa fa-chart-bar fa-4x text-muted"></i>
     </div>
-    <h3 class="text-muted">{{#str}} noGlobalDataAvailable, local_datacurso_ratings {{/str}}</h3>
-    <p class="text-muted mb-4">{{#str}} noGlobalDataDescription, local_datacurso_ratings {{/str}}</p>
+    <h3 class="text-muted">{{#str}} noglobaldataavailable, local_datacurso_ratings {{/str}}</h3>
+    <p class="text-muted mb-4">{{#str}} noglobaldatadescription, local_datacurso_ratings {{/str}}</p>
     <div class="alert alert-info">
-        <h5>{{#str}} getStarted, local_datacurso_ratings {{/str}}</h5>
-        <p class="mb-0">{{#str}} getStartedDescription, local_datacurso_ratings {{/str}}</p>
+        <h5>{{#str}} getstarted, local_datacurso_ratings {{/str}}</h5>
+        <p class="mb-0">{{#str}} getstarteddescription, local_datacurso_ratings {{/str}}</p>
     </div>
     <div class="mt-4">
         <button class="btn btn-primary" onclick="location.reload()">

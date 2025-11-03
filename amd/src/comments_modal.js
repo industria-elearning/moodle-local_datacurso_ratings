@@ -14,35 +14,38 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module comments_modal
+ * Handles the display of comments in a modal window.
  *
  * @module     local_datacurso_ratings/comments_modal
  * @copyright  2025 Industria Elearning <info@industriaelearning.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* eslint-disable */
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
+import Notification from 'core/notification';
+import {get_string as getString} from 'core/str';
 
 /**
- * Initialize comments modal functionality
+ * Initialize comments modal functionality.
  */
 export const init = () => {
-    // Add click handlers to all "View Comments" buttons
+    // Add click handlers to all "View Comments" buttons.
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('view-comments-modal') || 
-            e.target.closest('.view-comments-modal')) {
-            
+        if (
+            e.target.classList.contains('view-comments-modal') ||
+            e.target.closest('.view-comments-modal')
+        ) {
             e.preventDefault();
-            const button = e.target.classList.contains('view-comments-modal') ? 
-                          e.target : e.target.closest('.view-comments-modal');
-            
+            const button = e.target.classList.contains('view-comments-modal')
+                ? e.target
+                : e.target.closest('.view-comments-modal');
+
             const cmid = button.getAttribute('data-cmid');
             const activityName = button.getAttribute('data-activity');
-            
+
             if (cmid) {
                 openCommentsModal(cmid, activityName);
             }
@@ -51,37 +54,38 @@ export const init = () => {
 };
 
 /**
- * Open the comments modal for a specific activity
- * @param {Number} cmid Course module ID
- * @param {String} activityName Activity name
+ * Open the comments modal for a specific activity.
+ * @param {Number} cmid Course module ID.
+ * @param {String} activityName Activity name.
  */
-function openCommentsModal(cmid, activityName) {
+async function openCommentsModal(cmid, activityName) {
+    const comments = await getString('comments', 'local_datacurso_ratings');
     ModalFactory.create({
         type: ModalFactory.types.DEFAULT,
-        title: 'Comentarios: ' + activityName,
-        body: '<div class="text-center p-4"><div class="spinner-border"></div><p>Cargando comentarios...</p></div>',
+        title: comments + ' : ' + activityName,
+        body: Templates.render('local_datacurso_ratings/report_ratings_loading', {}),
         large: true
     }).then(function(modal) {
         modal.show();
-        
-        // Load comments data
+
+        // Load comments data.
         loadCommentsData(cmid, 0, '', modal);
-        
-        // Handle modal events
+
+        // Handle modal events.
         modal.getRoot().on(ModalEvents.hidden, function() {
             modal.destroy();
         });
-        
+
         return modal;
     });
 }
 
 /**
- * Load comments data for the modal
- * @param {Number} cmid Course module ID
- * @param {Number} page Page number
- * @param {String} search Search text
- * @param {Object} modal Modal instance
+ * Load comments data for the modal.
+ * @param {Number} cmid Course module ID.
+ * @param {Number} page Page number.
+ * @param {String} search Search text.
+ * @param {Object} modal Modal instance.
  */
 function loadCommentsData(cmid, page = 0, search = '', modal) {
     Ajax.call([{
@@ -93,34 +97,31 @@ function loadCommentsData(cmid, page = 0, search = '', modal) {
             search: search
         }
     }])[0]
-    .then((data) => {
-        return Templates.render('local_datacurso_ratings/comments_modal_content', {
-            ...data,
-            search_term: search
+        .then((data) => {
+            return Templates.render('local_datacurso_ratings/comments_modal_content', {
+                ...data,
+                searchterm: search
+            });
+        })
+        .then((html,js) => {
+            modal.setBody(html);
+            Templates.runTemplateJS(js);
+            initModalFeatures(cmid, modal);
+        })
+        .catch((err) => {
+            modal.setBody(Notification.exception(err));
         });
-    })
-    .then((html, js) => {
-        modal.setBody(html);
-        Templates.runTemplateJS(js);
-        
-        // Initialize modal functionality
-        initModalFeatures(cmid, modal);
-    })
-    .catch((error) => {
-        console.error('Error loading comments:', error);
-        modal.setBody('<div class="alert alert-danger">Error al cargar los comentarios. Intente nuevamente.</div>');
-    });
 }
 
 /**
- * Initialize modal features (search, pagination)
- * @param {Number} cmid Course module ID
- * @param {Object} modal Modal instance
+ * Initialize modal features (search, pagination).
+ * @param {Number} cmid Course module ID.
+ * @param {Object} modal Modal instance.
  */
 function initModalFeatures(cmid, modal) {
     const modalBody = modal.getBody()[0];
-    
-    // Search functionality
+
+    // Search functionality.
     const searchInput = modalBody.querySelector('#comments-search');
     if (searchInput) {
         let searchTimeout;
@@ -129,11 +130,10 @@ function initModalFeatures(cmid, modal) {
             searchTimeout = setTimeout(() => {
                 const searchTerm = this.value.trim();
                 loadCommentsData(cmid, 0, searchTerm, modal);
-            }, 500); // Debounce search
+            }, 500);
         });
     }
-    
-    // Clear search functionality
+
     const clearSearch = modalBody.querySelector('#clear-search');
     if (clearSearch) {
         clearSearch.addEventListener('click', function() {
@@ -141,8 +141,7 @@ function initModalFeatures(cmid, modal) {
             loadCommentsData(cmid, 0, '', modal);
         });
     }
-    
-    // Pagination functionality
+
     modalBody.addEventListener('click', function(e) {
         if (e.target.classList.contains('comments-pagination')) {
             e.preventDefault();
@@ -151,8 +150,7 @@ function initModalFeatures(cmid, modal) {
             loadCommentsData(cmid, page, searchTerm, modal);
         }
     });
-    
-    // Keywords click functionality
+
     modalBody.addEventListener('click', function(e) {
         if (e.target.classList.contains('keyword-filter')) {
             e.preventDefault();

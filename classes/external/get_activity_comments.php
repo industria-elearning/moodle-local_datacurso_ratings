@@ -72,6 +72,7 @@ class get_activity_comments extends external_api {
         $cm = get_coursemodule_from_id('', $params['cmid'], 0, false, MUST_EXIST);
         $context = context_module::instance($cm->id);
         self::validate_context($context);
+        require_capability('local/datacurso_ratings:viewcoursereport', $context);
 
         // Build the base query.
         $whereconditions = ['cmid = :cmid', 'feedback IS NOT NULL', "feedback != ''"];

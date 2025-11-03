@@ -21,51 +21,59 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* eslint-disable */
 import Ajax from 'core/ajax';
-import Notification from 'core/notification';
-import {get_string as getString} from 'core/str';
+import Templates from 'core/templates';
 
+/**
+ * Initialize AI course analysis button logic.
+ *
+ * @param {number} courseid - Current course ID.
+ */
 export const init = (courseid) => {
-    document.addEventListener('click', async function(e) {
-        if (e.target.classList.contains('btn-generate-ai-course') || e.target.closest('.btn-generate-ai-course')) {
-            e.preventDefault();
-
-            const button = e.target.closest('.btn-generate-ai-course');
-            const resultContainer = document.querySelector('.ai-analysis-result-course');
-
-            if (!courseid || !resultContainer) {
-                const missingData = 'No there id course';
-                console.warn(missingData);
-                return;
-            }
-
-            const generatingText = await getString('generatecommentaiprocess', 'local_datacurso_ratings');
-
-            resultContainer.innerHTML = `<div class="text-muted">
-                <i class="fa fa-spinner fa-spin"></i> ${generatingText}
-            </div>`;
-
-            Ajax.call([{
-                methodname: 'local_datacurso_ratings_get_ai_analysis_course',
-                args: { courseid: parseInt(courseid, 10) }
-            }])[0]
-            .then(async data => {
-                const analysisTitle = await getString('analysisresult', 'local_datacurso_ratings');
-
-                resultContainer.innerHTML = `
-                    <div class="alert alert-info p-2 mb-2">
-                        <strong>${analysisTitle}</strong><br>
-                        ${data.ai_analysis_course}
-                    </div>`;
-            })
-            .catch((e)=> {
-                resultContainer.innerHTML = `
-                    <div class="alert alert-danger p-2 mb-2">
-                        <i class="fa fa-exclamation-triangle"></i> ${e.message}
-                    </div>`;
-            });
+    document.addEventListener('click', async (e) => {
+        const button = e.target.closest('.btn-generate-ai-course');
+        if (!button) {
+            return;
         }
+
+        e.preventDefault();
+        const resultContainer = document.querySelector('.ai-analysis-result-course');
+
+        if (!courseid || !resultContainer) {
+            return;
+        }
+
+        const responseAi = {
+            loading: true,
+            success: false,
+            message: '',
+        };
+        // Loading state
+        button.disabled = true;
+        const htmlResponse = await Templates.render('local_datacurso_ratings/ai_analysis_response', responseAi);
+        resultContainer.innerHTML = htmlResponse;
+
+        const requests = Ajax.call([{
+            methodname: 'local_datacurso_ratings_get_ai_analysis_course',
+            args: {courseid: parseInt(courseid, 10)}
+        }]);
+
+        requests[0]
+            .then(async(data) => {
+                responseAi.loading = false;
+                responseAi.success = true;
+                responseAi.message = data.ai_analysis_course;
+                const htmlResponse = await Templates.render('local_datacurso_ratings/ai_analysis_response', responseAi);
+                resultContainer.innerHTML = htmlResponse;
+            })
+            .catch(async(e) => {
+                responseAi.loading = false;
+                responseAi.success = false;
+                responseAi.message = e.message;
+                const htmlResponse = await Templates.render('local_datacurso_ratings/ai_analysis_response', responseAi);
+                resultContainer.innerHTML = htmlResponse;
+                button.disabled = false;
+            });
     });
 };
 
