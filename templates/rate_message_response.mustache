@@ -26,6 +26,6 @@
     }
 }}
 
-<div class="alert alert-{{#is_success}}success{{/is_success}}{{^is_success}}danger{{/is_success}} mt-2" role="alert">
+<div class="alert alert-{{#type}}{{.}}{{/type}} mt-2" role="alert">
     {{message}}
 </div>

@@ -22,7 +22,7 @@
  */
 
 import Ajax from 'core/ajax';
-import {get_string as getString} from 'core/str';
+import { get_string as getString } from 'core/str';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 
@@ -73,19 +73,21 @@ export const init = (cmid) => {
      * @param {string} message The message text.
      * @param {string} [type='success'] Message type: success|error.
      */
-    const showMessage = async(message, type = 'success') => {
+    const showMessage = async (message, type) => {
         if (!msgResponse) {
             return;
         }
-
-        const htmlMessage = await Templates.render('local_datacurso_ratings/rate_message_response', {message, type});
-
+        const htmlMessage = await Templates.render('local_datacurso_ratings/rate_message_response', { message, type });
         msgResponse.innerHTML = htmlMessage;
     };
 
     // Handle like/dislike button click.
     container.querySelectorAll('[data-action="rate"]').forEach((btn) => {
         btn.addEventListener('click', () => {
+            container.querySelectorAll('input[name="feedback_choice"]').forEach((r) => {
+                r.checked = false;
+            });
+            hide(fbTextareaWrap);
             const rating = parseInt(btn.dataset.rating, 10);
 
             if (rating === 0) {
@@ -99,8 +101,6 @@ export const init = (cmid) => {
                 hide(dislikeOptions);
                 sendBtn?.setAttribute('data-rating', '1');
             }
-
-            hide(fbTextareaWrap);
         });
     });
 
@@ -159,7 +159,7 @@ export const init = (cmid) => {
     const sendRating = (cmid, rating, feedback) => {
         const requests = Ajax.call([{
             methodname: 'local_datacurso_ratings_save_rating',
-            args: {cmid, rating, feedback}
+            args: { cmid, rating, feedback }
         }]);
 
         requests[0]
@@ -188,8 +188,8 @@ export const init = (cmid) => {
                 hide(fbBlock);
                 hide(fbTextareaWrap);
             })
-            .catch((e)=> (Notification.exception(e)));
+            .catch((e) => (Notification.exception(e)));
     };
 };
 
-export default {init};
+export default { init };

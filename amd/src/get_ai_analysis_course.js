@@ -65,6 +65,7 @@ export const init = (courseid) => {
                 responseAi.message = data.ai_analysis_course;
                 const htmlResponse = await Templates.render('local_datacurso_ratings/ai_analysis_response', responseAi);
                 resultContainer.innerHTML = htmlResponse;
+                button.disabled = false;
             })
             .catch(async(e) => {
                 responseAi.loading = false;
