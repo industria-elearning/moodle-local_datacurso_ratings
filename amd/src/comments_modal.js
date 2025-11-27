@@ -118,7 +118,6 @@ function loadCommentsData(cmid, page = 0, search = '', modal) {
             initModalFeatures(cmid, modal);
         })
         .catch((err) => {
-            // En caso de error, muestra el mensaje de error en el cuerpo del modal.
             modal.setBody(Notification.exception(err));
         });
 }
@@ -129,7 +128,6 @@ function loadCommentsData(cmid, page = 0, search = '', modal) {
  * @param {Object} modal Modal instance.
  */
 function initModalFeatures(cmid, modal) {
-    // Utiliza getBody() para obtener el elemento del cuerpo del modal
     const modalBody = modal.getBody()[0];
 
     // Search functionality.
