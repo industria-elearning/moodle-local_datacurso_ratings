@@ -7,33 +7,33 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Handles the display of comments in a modal window.
  *
- * @module     local_datacurso_ratings/comments_modal
- * @copyright  2025 Industria Elearning <info@industriaelearning.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @module local_datacurso_ratings/comments_modal
+ * @copyright 2025 Industria Elearning <info@industriaelearning.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 import Ajax from 'core/ajax';
 import Templates from 'core/templates';
-import ModalFactory from 'core/modal_factory';
+import Modal from 'core/modal';
 import ModalEvents from 'core/modal_events';
 import Notification from 'core/notification';
-import {get_string as getString} from 'core/str';
+import { get_string as getString } from 'core/str';
 
 /**
  * Initialize comments modal functionality.
  */
 export const init = () => {
     // Add click handlers to all "View Comments" buttons.
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (
             e.target.classList.contains('view-comments-modal') ||
             e.target.closest('.view-comments-modal')
@@ -59,25 +59,34 @@ export const init = () => {
  * @param {String} activityName Activity name.
  */
 async function openCommentsModal(cmid, activityName) {
-    const comments = await getString('comments', 'local_datacurso_ratings');
-    ModalFactory.create({
-        type: ModalFactory.types.DEFAULT,
-        title: comments + ' : ' + activityName,
-        body: Templates.render('local_datacurso_ratings/report_ratings_loading', {}),
-        large: true
-    }).then(function(modal) {
+    try {
+        const [comments, initialBodyHTML] = await Promise.all([
+            getString('comments', 'local_datacurso_ratings'),
+            Templates.render('local_datacurso_ratings/report_ratings_loading', {})
+        ]);
+
+        const modal = await Modal.create({
+            title: comments + ' : ' + activityName,
+            body: initialBodyHTML,
+            large: true,
+            scrollable: true,
+            removeOnClose: true
+        });
+
         modal.show();
 
-        // Load comments data.
         loadCommentsData(cmid, 0, '', modal);
 
-        // Handle modal events.
-        modal.getRoot().on(ModalEvents.hidden, function() {
+        modal.getRoot().on(ModalEvents.hidden, function () {
             modal.destroy();
         });
 
         return modal;
-    });
+
+    } catch (err) {
+        Notification.exception(err);
+        return null;
+    }
 }
 
 /**
@@ -103,7 +112,7 @@ function loadCommentsData(cmid, page = 0, search = '', modal) {
                 searchterm: search
             });
         })
-        .then((html,js) => {
+        .then((html, js) => {
             modal.setBody(html);
             Templates.runTemplateJS(js);
             initModalFeatures(cmid, modal);
@@ -125,7 +134,7 @@ function initModalFeatures(cmid, modal) {
     const searchInput = modalBody.querySelector('#comments-search');
     if (searchInput) {
         let searchTimeout;
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const searchTerm = this.value.trim();
@@ -136,13 +145,13 @@ function initModalFeatures(cmid, modal) {
 
     const clearSearch = modalBody.querySelector('#clear-search');
     if (clearSearch) {
-        clearSearch.addEventListener('click', function() {
+        clearSearch.addEventListener('click', function () {
             searchInput.value = '';
             loadCommentsData(cmid, 0, '', modal);
         });
     }
 
-    modalBody.addEventListener('click', function(e) {
+    modalBody.addEventListener('click', function (e) {
         if (e.target.classList.contains('comments-pagination')) {
             e.preventDefault();
             const page = parseInt(e.target.getAttribute('data-page'));
@@ -151,7 +160,7 @@ function initModalFeatures(cmid, modal) {
         }
     });
 
-    modalBody.addEventListener('click', function(e) {
+    modalBody.addEventListener('click', function (e) {
         if (e.target.classList.contains('keyword-filter')) {
             e.preventDefault();
             const keyword = e.target.textContent.trim();
@@ -163,4 +172,4 @@ function initModalFeatures(cmid, modal) {
     });
 }
 
-export default {init};
+export default { init };

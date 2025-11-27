@@ -27,7 +27,11 @@
 <div class="feedback-admin" data-type="{{type}}">
 
     <form class="feedback-form d-flex gap-5 mb-3">
-        <input type="text" name="feedbacktext" class="form-control mr-2" placeholder="{{#str}} add, core {{/str}}" required>
+        <input type="text" name="feedbacktext" class="form-control mr-2" 
+            placeholder="{{#str}} add, core {{/str}}" 
+            required
+            maxlength="150"
+        >
         <button type="submit" class="btn btn-primary">{{#str}} add, core {{/str}}</button>
     </form>
 
