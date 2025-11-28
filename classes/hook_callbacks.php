@@ -22,7 +22,6 @@ use core\hook\output\before_footer_html_generation;
  * Hook callbacks for local_datacurso_ratings.
  *
  * @package    local_datacurso_ratings
- * @category   hook
  * @copyright  2025 Industria Elearning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
