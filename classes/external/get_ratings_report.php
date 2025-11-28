@@ -75,7 +75,8 @@ class get_ratings_report extends external_api {
                    cm.course,
                    SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) AS likes,
                    SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) AS dislikes,
-                   ROUND(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(r.id), 0), 1) AS porcentaje_aprobacion,
+                   ROUND(SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) * 100.0
+                   / NULLIF(COUNT(r.id), 0), 1) AS porcentaje_aprobacion,
                    {$concatcomments}
             FROM {local_datacurso_ratings} r
             JOIN {course_modules} cm ON cm.id = r.cmid
